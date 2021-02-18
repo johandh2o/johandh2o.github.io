@@ -7,7 +7,7 @@
 
 # Site Settings
 locale                   : "en-US"
-title                    : "Johan de Aguas / Statistical thoughts"
+title                    : "Johan de Aguas"
 title_separator          : "-"
 name                     : &name "Johan de Aguas"
 description              : &description "Engineer, Economist, Statistician"
@@ -81,7 +81,7 @@ analytics:
 # Site Author
 author:
   name             : "Johan de Aguas"
-  avatar           : "profile.png"
+  avatar           : "profile1.jpg"
   bio              : "Engineer, Economist, Statistician"
   location         : "East Lansing, MI."
   employer         :
