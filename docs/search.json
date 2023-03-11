@@ -53,6 +53,6 @@
     "href": "blog.html#when-selection-depends-on-mediation-part-1",
     "title": "Blog",
     "section": "When selection depends on mediation: part 1",
-    "text": "When selection depends on mediation: part 1\nHola\nSee more"
+    "text": "When selection depends on mediation: part 1\nWe review the motivation and assumptions for the inverse probability weighting (IPW) estimator of the average treatment effect (ATE) using experimental data (randomized treatment assignment) affected by selection bias. The IPW estimator of the ATE can be expressed in terms of:\n\\[\n\\hat{\\mathbb{E}}[Y\\mid do(A=a)]= N^{-1}\\sum_{i=1}^N \\mathbb{I}[A_i=a] v_i(a)\\cdot w_i\\cdot y_i\n\\]\nWe check consistency and present a small simulation for the case where the selection mechanism depends on the treatment assignment and other pre-treatment variables.\nWe open the discussion for the case where the selection mechanism depends on a mediator of the effect as well.\nSee more"
   }
 ]

@@ -59,6 +59,7 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -130,10 +131,16 @@ ul.task-list li input[type="checkbox"] {
 <section id="when-selection-depends-on-mediation-part-2" class="level2">
 <h2 class="anchored" data-anchor-id="when-selection-depends-on-mediation-part-2">When selection depends on mediation: part 2</h2>
 <p>To be filled</p>
+<hr>
 </section>
 <section id="when-selection-depends-on-mediation-part-1" class="level2">
 <h2 class="anchored" data-anchor-id="when-selection-depends-on-mediation-part-1">When selection depends on mediation: part 1</h2>
-<p>Hola</p>
+<p>We review the motivation and assumptions for the <em>inverse probability weighting</em> (IPW) estimator of the average treatment effect (ATE) using experimental data (randomized treatment assignment) affected by selection bias. The IPW estimator of the ATE can be expressed in terms of:</p>
+<p><span class="math display">\[
+\hat{\mathbb{E}}[Y\mid do(A=a)]= N^{-1}\sum_{i=1}^N \mathbb{I}[A_i=a] v_i(a)\cdot w_i\cdot y_i
+\]</span></p>
+<p>We check consistency and present a small simulation for the case where the selection mechanism depends on the treatment assignment and other pre-treatment variables.</p>
+<p>We open the discussion for the case where the selection mechanism depends on a mediator of the effect as well.</p>
 <p><a href="https://johandh2o.github.io/ipw-selection/">See more</a></p>
 
 

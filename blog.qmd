@@ -7,8 +7,18 @@ fontsize: 12pt
 
 To be filled
 
+------------------------------------------------------------------------
+
 ## When selection depends on mediation: part 1
 
-Hola
+We review the motivation and assumptions for the *inverse probability weighting* (IPW) estimator of the average treatment effect (ATE) using experimental data (randomized treatment assignment) affected by selection bias. The IPW estimator of the ATE can be expressed in terms of:
+
+$$
+\hat{\mathbb{E}}[Y\mid do(A=a)]= N^{-1}\sum_{i=1}^N \mathbb{I}[A_i=a] v_i(a)\cdot w_i\cdot y_i 
+$$
+
+We check consistency and present a small simulation for the case where the selection mechanism depends on the treatment assignment and other pre-treatment variables.
+
+We open the discussion for the case where the selection mechanism depends on a mediator of the effect as well.
 
 [See more](https://johandh2o.github.io/ipw-selection/)
