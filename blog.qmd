@@ -1,9 +1,14 @@
 ---
 title: "Blog"
+fontsize: 12pt
 ---
 
-About this site
+## When selection depends on mediation: part 2
 
-```{r}
-1 + 1
-```
+To be filled
+
+## When selection depends on mediation: part 1
+
+Hola
+
+[See more](https://johandh2o.github.io/ipw-selection/)
