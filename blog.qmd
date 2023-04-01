@@ -3,13 +3,13 @@ title: "Blog"
 fontsize: 12pt
 ---
 
-## When selection depends on mediation: part 2
+## The probability of necessity and sufficiency
 
 To be filled
 
 ------------------------------------------------------------------------
 
-## When selection depends on mediation: part 1
+## Recovering from selection bias
 
 We review the motivation and assumptions for the *inverse probability weighting* (IPW) estimator of the average treatment effect (ATE) using experimental data (randomized treatment assignment) affected by selection bias. The IPW estimator of the ATE can be expressed in terms of:
 
@@ -19,6 +19,6 @@ $$
 
 We check consistency and present a small simulation for the case where the selection mechanism depends on the treatment assignment and other pre-treatment variables.
 
-We open the discussion for the case where the selection mechanism depends on a mediator of the effect as well.
+We check that, for this case, the IPW estimand and the estimand produced by Correa, Tian, and Bareinboim (2018) via *generalized adjustment criteria* are algebraically equivalent.
 
 [See more](https://johandh2o.github.io/ipw-selection/)
