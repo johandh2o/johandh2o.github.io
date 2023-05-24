@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.269">
+<meta name="generator" content="quarto-1.2.475">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -35,10 +35,12 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -89,6 +91,9 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Blog</span></a>
   </li>  
 </ul>
+              <div class="quarto-toggle-container">
+                  <a href="" class="quarto-color-scheme-toggle nav-link" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+              </div>
               <div id="quarto-search" class="" title="Search"></div>
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
@@ -103,8 +108,8 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#when-selection-depends-on-mediation-part-2" id="toc-when-selection-depends-on-mediation-part-2" class="nav-link active" data-scroll-target="#when-selection-depends-on-mediation-part-2">When selection depends on mediation: part 2</a></li>
-  <li><a href="#when-selection-depends-on-mediation-part-1" id="toc-when-selection-depends-on-mediation-part-1" class="nav-link" data-scroll-target="#when-selection-depends-on-mediation-part-1">When selection depends on mediation: part 1</a></li>
+  <li><a href="#probability-of-necessity-and-sufficiency-with-a-continuous-outcome" id="toc-probability-of-necessity-and-sufficiency-with-a-continuous-outcome" class="nav-link active" data-scroll-target="#probability-of-necessity-and-sufficiency-with-a-continuous-outcome">Probability of necessity and sufficiency with a continuous outcome</a></li>
+  <li><a href="#recovering-from-selection-bias" id="toc-recovering-from-selection-bias" class="nav-link" data-scroll-target="#recovering-from-selection-bias">Recovering from selection bias</a></li>
   </ul>
 </nav>
     </div>
@@ -128,19 +133,19 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<section id="when-selection-depends-on-mediation-part-2" class="level2">
-<h2 class="anchored" data-anchor-id="when-selection-depends-on-mediation-part-2">When selection depends on mediation: part 2</h2>
+<section id="probability-of-necessity-and-sufficiency-with-a-continuous-outcome" class="level2">
+<h2 class="anchored" data-anchor-id="probability-of-necessity-and-sufficiency-with-a-continuous-outcome">Probability of necessity and sufficiency with a continuous outcome</h2>
 <p>To be filled</p>
 <hr>
 </section>
-<section id="when-selection-depends-on-mediation-part-1" class="level2">
-<h2 class="anchored" data-anchor-id="when-selection-depends-on-mediation-part-1">When selection depends on mediation: part 1</h2>
+<section id="recovering-from-selection-bias" class="level2">
+<h2 class="anchored" data-anchor-id="recovering-from-selection-bias">Recovering from selection bias</h2>
 <p>We review the motivation and assumptions for the <em>inverse probability weighting</em> (IPW) estimator of the average treatment effect (ATE) using experimental data (randomized treatment assignment) affected by selection bias. The IPW estimator of the ATE can be expressed in terms of:</p>
 <p><span class="math display">\[
 \hat{\mathbb{E}}[Y\mid do(A=a)]= N^{-1}\sum_{i=1}^N \mathbb{I}[A_i=a] v_i(a)\cdot w_i\cdot y_i
 \]</span></p>
 <p>We check consistency and present a small simulation for the case where the selection mechanism depends on the treatment assignment and other pre-treatment variables.</p>
-<p>We open the discussion for the case where the selection mechanism depends on a mediator of the effect as well.</p>
+<p>We check that, for this case, the IPW estimand and the estimand produced by Correa, Tian, and Bareinboim (2018) via <em>generalized adjustment criteria</em> are algebraically equivalent.</p>
 <p><a href="https://johandh2o.github.io/ipw-selection/">See more</a></p>
 
 
@@ -167,6 +172,121 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
   toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'alternate';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
   const icon = "";
   const anchorJS = new window.AnchorJS();
   anchorJS.options = {

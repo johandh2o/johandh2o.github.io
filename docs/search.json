@@ -54,5 +54,12 @@
     "title": "Blog",
     "section": "When selection depends on mediation: part 1",
     "text": "When selection depends on mediation: part 1\nWe review the motivation and assumptions for the inverse probability weighting (IPW) estimator of the average treatment effect (ATE) using experimental data (randomized treatment assignment) affected by selection bias. The IPW estimator of the ATE can be expressed in terms of:\n\\[\n\\hat{\\mathbb{E}}[Y\\mid do(A=a)]= N^{-1}\\sum_{i=1}^N \\mathbb{I}[A_i=a] v_i(a)\\cdot w_i\\cdot y_i\n\\]\nWe check consistency and present a small simulation for the case where the selection mechanism depends on the treatment assignment and other pre-treatment variables.\nWe open the discussion for the case where the selection mechanism depends on a mediator of the effect as well.\nSee more"
+  },
+  {
+    "objectID": "blog.html#recovering-from-selection-bias",
+    "href": "blog.html#recovering-from-selection-bias",
+    "title": "Blog",
+    "section": "Recovering from selection bias",
+    "text": "Recovering from selection bias\nWe review the motivation and assumptions for the inverse probability weighting (IPW) estimator of the average treatment effect (ATE) using experimental data (randomized treatment assignment) affected by selection bias. The IPW estimator of the ATE can be expressed in terms of:\n\\[\n\\hat{\\mathbb{E}}[Y\\mid do(A=a)]= N^{-1}\\sum_{i=1}^N \\mathbb{I}[A_i=a] v_i(a)\\cdot w_i\\cdot y_i\n\\]\nWe check consistency and present a small simulation for the case where the selection mechanism depends on the treatment assignment and other pre-treatment variables.\nWe check that, for this case, the IPW estimand and the estimand produced by Correa, Tian, and Bareinboim (2018) via generalized adjustment criteria are algebraically equivalent.\nSee more"
   }
 ]
