@@ -3,7 +3,7 @@ title: "Blog"
 fontsize: 12pt
 ---
 
-## Probability of necessity and sufficiency with continuous outcome
+## Probability of necessity and sufficiency with a continuous outcome
 
 To be filled
 
