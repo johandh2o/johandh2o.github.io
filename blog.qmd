@@ -7,6 +7,9 @@ fontsize: 12pt
 
 To be filled
 
+[See more](https://johandh2o.github.io/pcausation-continuous/)
+
+
 ------------------------------------------------------------------------
 
 ## Recovering from selection bias
