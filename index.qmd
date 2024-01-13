@@ -9,6 +9,10 @@ about:
   links:
     - text: CV
       href: https://drive.google.com/file/d/1mCy2vRoN04KDuXQkHEuUcZSbZkfc_i5v/view?usp=sharing 
+    - text: Scholar
+      href: https://scholar.google.com/citations?user=DLTE_HoAAAAJ
+    - text: ORCiD
+      href: https://orcid.org/0009-0008-0862-8210
     - text: LinkedIn
       href: https://www.linkedin.com/in/johandh2o/
     - text: GitHub
@@ -23,19 +27,21 @@ about:
 
 ## About me
 
-I am a PhD student at the Faculty of Mathematics and Natural Sciences ([MatNat](https://www.mn.uio.no/english/)) at the University of Oslo ([UiO](https://www.uio.no/english/)), under the supervision of [Dr. Johan Pensar](https://www.mn.uio.no/math/english/people/aca/johanpen/). Concurrently, I am a researcher at the Norwegian Institute of Public Health ([NIPH](https://www.fhi.no/en/)), under the supervision of [Dr. Guido Biele](https://gbiele.github.io/).
+I am currently pursuing my PhD in the Faculty of Mathematics and Natural Sciences ([MatNat](https://www.mn.uio.no/english/)) at the University of Oslo ([UiO](https://www.uio.no/english/)), under the supervision of [Dr. Johan Pensar](https://www.mn.uio.no/math/english/people/aca/johanpen/). Additionally, I hold a research position at the Norwegian Institute of Public Health ([NIPH](https://www.fhi.no/en/)), supervised by [Dr. Guido Biele](https://gbiele.github.io/).
 
-I hold baccalaureate degrees in industrial engineering and in economics, from Universidad de los Andes ([UniAndes](https://uniandes.edu.co/en)) in Colombia; plus master's degrees in economics and in statistics, the latter from Michigan State University ([MSU](https://msu.edu/)). I am an international [Fulbright scholar](https://foreign.fulbrightonline.org/) (2019).
+I hold undergraduate degrees in industrial engineering and economics from Universidad de los Andes ([UniAndes](https://uniandes.edu.co/en)) in Colombia. Additionally, I have master's degrees in economics and statistics. I earned the latter at Michigan State University ([MSU](https://msu.edu/)) as an international [Fulbright](https://foreign.fulbrightonline.org/) scholar.
+
+I have prior experience working as a research consultant and lead data scientist, contributing to projects involving impact evaluation, regional competitiveness, international trade, mobile banking, and alternative credit scoring.
 
 ## Research
 
-My research interests, accumulated knowledge and experience gravitate around:
+My research interests and experience revolve around:
 
--   Causal inference with observational data
+- Graphical and nonparametric approaches to causal inference
 
--   Epistemic uncertainty quantification for machine learning and causal inference
+- Uncertainty quantification for inference and prediction
 
--   Statistics + game theory: strategic complements networks, and dynamic treatment regimes
+- Application of econometrics and game theory to network interactions and peer effects
 
 ## Career
 
@@ -43,14 +49,16 @@ My research interests, accumulated knowledge and experience gravitate around:
 
 -   *2020 - 2021*: [**Consultant**]{.underline} (promoted from Summer Intern) at the Inter-American Development Bank ([IADB](https://www.iadb.org/en/about-us/overview))
 
--   *2018 - 2019*: [**Lead Data Scientist**]{.underline} (promoted from Data Scientist) at Tpaga (*Colombian startup*)
+-   *2018 - 2019*: [**Lead Data Scientist**]{.underline} (promoted from Data Scientist) at [Tpaga](https://tpaga.co) (startup)
 
 -   *2014 - 2017*: [**Research Consultant**]{.underline} at the Economic Commission for Latin America and the Caribbean ([ECLAC](https://www.cepal.org/en/headquarters-and-offices/eclac-bogota))
 
 ## Scholarships and grants
 
--   [*International Fulbright scholar program*](https://foreign.fulbrightonline.org/) --- United States Department of State (2019-2021)
+- *2023*:  **Germany exchange program** --- Norwegian Artificial Intelligence Research Consortium - [NORA](https://www.nora.ai)
 
--   *High-level human capital training program for the regions* --- Ministry of Science, Technology and Innovation of Colombia (2015-2018)
+- *2019 - 2021*:  [**International Fulbright scholar program**](https://foreign.fulbrightonline.org/) --- United States Department of State
 
--   *Quiero Estudiar scholarship program* --- Universidad de los Andes (2008-2012)
+- *2015-2018*:  **High-level human capital training program for the regions** --- Ministry of Science, Technology and Innovation of Colombia
+
+- *2008-2012*: **Quiero Estudiar scholarship program** --- Universidad de los Andes
