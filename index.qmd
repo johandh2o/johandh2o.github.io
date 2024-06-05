@@ -29,7 +29,7 @@ about:
 
 ## About me
 
-I am currently pursuing my PhD at the Faculty of Mathematics and Natural Sciences ([MatNat](https://www.mn.uio.no/english/)) at the University of Oslo ([UiO](https://www.uio.no/english/)), under the supervision of [Dr. Johan Pensar](https://www.mn.uio.no/math/english/people/aca/johanpen/). Additionally, I hold a research position at the Norwegian Institute of Public Health ([NIPH](https://www.fhi.no/en/)), where I am supervised by Dr. [Dr. Guido Biele](https://gbiele.github.io/). 
+I am currently pursuing my PhD at the Faculty of Mathematics and Natural Sciences ([MatNat](https://www.mn.uio.no/english/)) at the University of Oslo ([UiO](https://www.uio.no/english/)), under the supervision of [Dr. Johan Pensar](https://www.mn.uio.no/math/english/people/aca/johanpen/). Additionally, I hold a research position at the Norwegian Institute of Public Health ([NIPH](https://www.fhi.no/en/)), where I am supervised by [Dr. Guido Biele](https://gbiele.github.io/). 
 
 My PhD research project focuses on estimating the causal effect of pharmacological treatment for attention-deficit/hyperactivity disorder (ADHD) upon school performance using observational data from Norwegian schoolchildren.
 
