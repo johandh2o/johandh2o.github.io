@@ -15,6 +15,8 @@ about:
       href: https://orcid.org/0009-0008-0862-8210
     - text: LinkedIn
       href: https://www.linkedin.com/in/johandh2o/
+    - text: CrossValidated
+      href: https://stats.stackexchange.com/users/387635/johan-de-aguas
     - text: GitHub
       href: https://github.com/johandh2o
     - text: Email
@@ -27,21 +29,23 @@ about:
 
 ## About me
 
-I am currently pursuing my PhD in the Faculty of Mathematics and Natural Sciences ([MatNat](https://www.mn.uio.no/english/)) at the University of Oslo ([UiO](https://www.uio.no/english/)), under the supervision of [Dr. Johan Pensar](https://www.mn.uio.no/math/english/people/aca/johanpen/). Additionally, I hold a research position at the Norwegian Institute of Public Health ([NIPH](https://www.fhi.no/en/)), supervised by [Dr. Guido Biele](https://gbiele.github.io/).
+I am currently pursuing my PhD at the Faculty of Mathematics and Natural Sciences ([MatNat](https://www.mn.uio.no/english/)) at the University of Oslo ([UiO](https://www.uio.no/english/)), under the supervision of [Dr. Johan Pensar](https://www.mn.uio.no/math/english/people/aca/johanpen/). Additionally, I hold a research position at the Norwegian Institute of Public Health ([NIPH](https://www.fhi.no/en/)), where I am supervised by Dr. [Dr. Guido Biele](https://gbiele.github.io/). 
 
-I hold undergraduate degrees in industrial engineering and economics from Universidad de los Andes ([UniAndes](https://uniandes.edu.co/en)) in Colombia. Additionally, I have master's degrees in economics and statistics. I earned the latter at Michigan State University ([MSU](https://msu.edu/)) as an international [Fulbright](https://foreign.fulbrightonline.org/) scholar.
+My PhD research project focuses on estimating the causal effect of pharmacological treatment for attention-deficit/hyperactivity disorder (ADHD) upon school performance using observational data from Norwegian schoolchildren.
 
-I have prior experience working as a research consultant and lead data scientist, contributing to projects involving impact evaluation, regional competitiveness, international trade, mobile banking, and alternative credit scoring.
+I possess undergraduate degrees in industrial engineering and economics from Universidad de los Andes ([UniAndes](https://uniandes.edu.co/en)) in Colombia. Furthermore, I have obtained master’s degrees in economics and statistics, the latter of which was awarded by Michigan State University ([MSU](https://msu.edu/)) where I was an international [Fulbright](https://foreign.fulbrightonline.org/) scholar.
+
+My professional experience includes working as a research consultant and lead data scientist. In these roles, I have contributed to projects focused on impact evaluation, regional competitiveness, international trade, mobile banking, and alternative credit scoring.
 
 ## Research
 
-My research interests and experience revolve around:
+My research interests and experience encompass:
 
-- Graphical and nonparametric approaches to causal inference
+- Graphical and nonparametric methods for identifying causal queries.
 
-- Uncertainty quantification for inference and prediction
+- Semiparametric inference with valid uncertainty quantification.
 
-- Application of econometrics and game theory to network interactions and peer effects
+- Applications that bridge econometrics, biostatistics, game theory, and network science.
 
 ## Career
 
@@ -55,7 +59,7 @@ My research interests and experience revolve around:
 
 ## Scholarships and grants
 
-- *2023*:  **Germany exchange program** --- Norwegian Artificial Intelligence Research Consortium - [NORA](https://www.nora.ai)
+- *2023*:  **Germany exchange program with Helmholtz Information & Data Science Academy (HIDA)** --- Norwegian Artificial Intelligence Research Consortium - [NORA](https://www.nora.ai)
 
 - *2019 - 2021*:  [**International Fulbright scholar program**](https://foreign.fulbrightonline.org/) --- United States Department of State
 
