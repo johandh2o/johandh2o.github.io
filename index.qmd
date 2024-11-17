@@ -23,8 +23,8 @@ about:
       href: mailto:johandh2o@gmail.com
     - text: Twitter
       href: https://twitter.com/johandh2o
-    - text: Mastodon
-      href: https://mathstodon.xyz/@Johandh2o
+    - text: BlueSky
+      href: https://bsky.app/profile/johandh2o.bsky.social
 ---
 
 ## About me
