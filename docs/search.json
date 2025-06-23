@@ -14,73 +14,17 @@
     "text": "I am an international Fulbright scholar and currently work as a researcher. My research primarily focuses on causal inference with observational data, graphical models for information selection, semiparametric estimation theory, and spatial econometrics.\nI recently completed my PhD in Statistics at the Department of Mathematics, Faculty of Mathematics and Natural Sciences (MatNat), at the University of Oslo (UiO). My academic background also includes:\n\nMSc in Statistics – Michigan State University (MSU)\nMA in Economics – Universidad de los Andes (UniAndes)\nBA in Economics – UniAndes\nBEng in Industrial Engineering – UniAndes.\n\nMy professional experience spans roles as a researcher, consultant, and lead data scientist. I have contributed to projects involving:\n\nthe evaluation of benefits from pharmacological treatment for ADHD,\nthe analysis of international trade and investment flows,\nthe design and evaluation of randomized experiments for mobile banking products, and\nthe quantitative assessment of regional competitiveness, among others."
   },
   {
-    "objectID": "research.html",
-    "href": "research.html",
-    "title": "Research",
-    "section": "",
-    "text": "Causal inference with observational data\nI am interested in the formulation, identification, and estimation of stochastic interventions and dynamic treatment regimes using observational data. My work leverages graphical models, partial identification techniques, and transport maps to support more robust and uncertainty-aware decision-making.\nPapers:\n\nUpcomming.\n\n\n\nGraphical models for information selection\nMy research explores the specification of graphical models to represent selection mechanisms, missing data, and attrition, and the functional shifts they may induce. I have formulated policy-oriented causal queries tailored to these settings and developed graphical criteria to determine when such queries can be recovered from observational data.\nPapers:\n\nde Aguas, Henckel, Pensar, Biele (2025). Causal inference amid missingness-specific independencies and mechanism shifts. UAI proceedings (upcomming).\nde Aguas, Pensar, Varnet-Pérez, Biele (2025). Recovery and inference of causal effects with sequential adjustment for confounding and attrition. Journal of Causal Inference.\n\n\n\nSemiparametric estimation theory\nI have developed semiparametric estimators for causal effects that are both flexible and multiply robust to model misspecification, and that offer stable asymptotic uncertainty quantification. My work has focused on estimators for queries based on sequential regressions and for bounds of partially identified counterfactual parameters.\nPapers:\n\nde Aguas, Pensar, Frigessi, Biele (2025). Representation learning for collaborative targeted estimation of causal effects under attrition. Upcomming.\nde Aguas, Krumscheid, Pensar, Biele (2025). The probability of tiered benefit: Partial identification with robust and stable inference. CLeaR proceedings (upcomming).\n\n\n\nSpatial econometrics\nMy research has investigated the identification and estimation of spillover and contagion effects of spatially targeted policies in the presence of network interference. I have focused on agent-based systems with strategic complementarity, aiming to characterize policy effects at the resulting Nash equilibrium.\nMaster’s thesis:\n\nde Aguas (2017). Network externalities in the management of waste from rural production in the provinces of Colombia: a structural econometric model of a network game with strategic complements.\n\n\n\nApplications\nI have applied the causal, statistical, and machine learning methods I’ve developed to practical tasks such as:\n\nthe evaluation of benefits from pharmacological treatment for ADHD,\nthe analysis of international trade and investment flows,\nthe design and evaluation of randomized experiments for mobile banking products, and\nthe quantitative assessment of regional competitiveness, among others."
-  },
-  {
-    "objectID": "research.html#research-interests",
-    "href": "research.html#research-interests",
-    "title": "Research",
-    "section": "",
-    "text": "My work focuses on…"
-  },
-  {
-    "objectID": "research.html#dissertation",
-    "href": "research.html#dissertation",
-    "title": "Research",
-    "section": "Dissertation",
-    "text": "Dissertation\nTitle: Novel causal queries and methods…"
-  },
-  {
-    "objectID": "research.html#projects",
-    "href": "research.html#projects",
-    "title": "Research",
-    "section": "Projects",
-    "text": "Projects\n\nEvaluation of ADHD treatment on school performance\nPartial identification in selection-biased systems …"
-  },
-  {
-    "objectID": "research.html#causal-inference-with-observational-data",
-    "href": "research.html#causal-inference-with-observational-data",
-    "title": "Research",
-    "section": "",
-    "text": "My work focuses on…"
-  },
-  {
-    "objectID": "research.html#graphical-models-for-information-selection",
-    "href": "research.html#graphical-models-for-information-selection",
-    "title": "Research",
-    "section": "Graphical models for information selection",
-    "text": "Graphical models for information selection\nHola"
-  },
-  {
-    "objectID": "research.html#semiparametric-estimation-theory",
-    "href": "research.html#semiparametric-estimation-theory",
-    "title": "Research",
-    "section": "Semiparametric estimation theory",
-    "text": "Semiparametric estimation theory\n\nEvaluation of ADHD treatment on school performance\nPartial identification in selection-biased systems …"
-  },
-  {
-    "objectID": "research.html#spatial-econometrics",
-    "href": "research.html#spatial-econometrics",
-    "title": "Research",
-    "section": "Spatial econometrics",
-    "text": "Spatial econometrics\nHola"
-  },
-  {
-    "objectID": "research.html#applications",
-    "href": "research.html#applications",
-    "title": "Research",
-    "section": "Applications",
-    "text": "Applications\n\nEvaluation of benefits from pharmacological treatment for ADHD\nHola\n\n\nAnalysis of international trade and investment flows\nHola\n\n\nDesign and evaluation of randomized experiments for mobile banking products\nHola\n\n\nQuantitative assessment of regional competitiveness\nHola"
-  },
-  {
     "objectID": "index.html#scholarships-and-grants",
     "href": "index.html#scholarships-and-grants",
     "title": "Johan de Aguas",
     "section": "Scholarships and grants",
     "text": "Scholarships and grants\n\n2023: Germany exchange program with the Helmholtz Information & Data Science Academy (HIDA) – Norwegian Artificial Intelligence Research Consortium - NORA\n2019–2021: International Fulbright scholar program – United States Department of State\n2015–2018: High-level human capital training program for the regions – Ministry of Science, Technology and Innovation of Colombia\n2008–2012: Quiero Estudiar scholarship program – UniAndes"
+  },
+  {
+    "objectID": "research.html",
+    "href": "research.html",
+    "title": "Research",
+    "section": "",
+    "text": "Causal inference with observational data\nI am interested in the formulation, identification, and estimation of stochastic interventions and dynamic treatment regimes using observational data. My work leverages graphical models, partial identification techniques, and transport maps to support more robust and uncertainty-aware decision-making.\nPapers:\n\nUpcomming.\n\n\n\nGraphical models for information selection\nMy research explores the specification of graphical models to represent selection mechanisms, missing data, and attrition, and the functional shifts they may induce. I have formulated policy-oriented causal queries tailored to these settings and developed graphical criteria to determine when such queries can be recovered from observational data.\nPapers:\n\nde Aguas, Henckel, Pensar, Biele (2025). Causal inference amid missingness-specific independencies and mechanism shifts. UAI proceedings (upcomming).\nde Aguas, Pensar, Varnet-Pérez, Biele (2025). Recovery and inference of causal effects with sequential adjustment for confounding and attrition. Journal of Causal Inference.\n\n\n\nSemiparametric estimation theory\nI have developed semiparametric estimators for causal effects that are both flexible and multiply robust to model misspecification, and that offer stable asymptotic uncertainty quantification. My work has focused on estimators for queries based on sequential regressions and for bounds of partially identified counterfactual parameters.\nPapers:\n\nde Aguas, Pensar, Frigessi, Biele (2025). Representation learning for collaborative targeted estimation of causal effects under attrition. Upcomming.\nde Aguas, Krumscheid, Pensar, Biele (2025). The probability of tiered benefit: Partial identification with robust and stable inference. CLeaR proceedings (upcomming).\n\n\n\nSpatial econometrics\nMy research has investigated the identification and estimation of spillover and contagion effects of spatially targeted policies in the presence of network interference. I have focused on agent-based systems with strategic complementarity, aiming to characterize policy effects at the resulting Nash equilibrium.\nMaster’s thesis:\n\nde Aguas (2017). Network externalities in the management of waste from rural production in the provinces of Colombia: a structural econometric model of a network game with strategic complements.\n\n\n\nApplications\nI have applied the causal, statistical, and machine learning methods I’ve developed to practical tasks such as:\n\nthe evaluation of benefits from pharmacological treatment for ADHD,\nthe analysis of international trade and investment flows,\nthe design and evaluation of randomized experiments for mobile banking products, and\nthe quantitative assessment of regional competitiveness, among others."
   }
 ]

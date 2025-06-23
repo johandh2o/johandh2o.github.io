@@ -9,7 +9,7 @@ website:
     left:
       - href: index.qmd
         text: Home
-      - href: https://johandh2o.github.io/research/
+      - href: research.qmd
         text: Research
       - href: https://johandh2o.github.io/blog/
         text: Blog
