@@ -10,7 +10,7 @@ I am interested in the formulation, identification, and estimation of stochastic
 
 Papers:
 
-- Upcomming.
+- Upcoming.
 
 
 ### Graphical models for information selection
@@ -18,7 +18,7 @@ My research explores the specification of graphical models to represent selectio
 
 Papers:
 
-- **de Aguas**, Henckel, Pensar, Biele (2025). _Causal inference amid missingness-specific independencies and mechanism shifts_. [UAI proceedings (upcomming)](https://arxiv.org/abs/2506.15441).
+- **de Aguas**, Henckel, Pensar, Biele (2025). _Causal inference amid missingness-specific independencies and mechanism shifts_. [UAI proceedings (upcoming)](https://arxiv.org/abs/2506.15441).
 - **de Aguas**, Pensar, Varnet-Pérez, Biele (2025). _Recovery and inference of causal effects with sequential adjustment for confounding and attrition_. [Journal of Causal Inference](https://www.degruyterbrill.com/document/doi/10.1515/jci-2024-0009/html).
 
 ### Semiparametric estimation theory
@@ -26,8 +26,8 @@ I have developed semiparametric estimators for causal effects that are both flex
 
 Papers:
 
-- **de Aguas**, Pensar, Frigessi, Biele (2025). _Representation learning for collaborative targeted estimation of causal effects under attrition_. Upcomming.
-- **de Aguas**, Krumscheid, Pensar, Biele (2025). _The probability of tiered benefit: Partial identification with robust and stable inference_. [CLeaR proceedings (upcomming)](https://arxiv.org/abs/2502.10049).
+- **de Aguas**, Pensar, Frigessi, Biele (2025). _Representation learning for collaborative targeted estimation of causal effects under attrition_. Upcoming.
+- **de Aguas**, Krumscheid, Pensar, Biele (2025). _The probability of tiered benefit: Partial identification with robust and stable inference_. [CLeaR proceedings (upcoming)](https://arxiv.org/abs/2502.10049).
 
 ### Spatial econometrics
 
@@ -35,7 +35,7 @@ My research has investigated the identification and estimation of spillover and 
 
 Master's thesis:
 
-- **de Aguas** (2017). _Network externalities in the management of waste from rural production in the provinces of Colombia: a structural econometric model of a network game with strategic complements_.
+- **de Aguas** (2017). _Network externalities in the management of waste from rural production in the provinces of Colombia: a structural econometric model of a network game with strategic complements_. [Thesis in Spanish] Universidad de los Andes.
 
 ### Applications
 
