@@ -1,6 +1,6 @@
 ---
 title: "Johan de Aguas"
-image: headshot.png
+image: headshot.JPG
 fontsize: 12pt
 about: 
   template: trestles
@@ -29,42 +29,31 @@ about:
 
 ## About me
 
-I'm completing my PhD degree at the Faculty of Mathematics and Natural Sciences ([MatNat](https://www.mn.uio.no/english/)) at the University of Oslo ([UiO](https://www.uio.no/english/)), under the supervision of [Dr. Johan Pensar](https://www.mn.uio.no/math/english/people/aca/johanpen/). Additionally, I hold a research position at the Norwegian Institute of Public Health ([NIPH](https://www.fhi.no/en/)), where I work under the guidance of [Dr. Guido Biele](https://gbiele.github.io/). 
+I am an international [Fulbright](https://foreign.fulbrightonline.org/) scholar and currently work as a researcher. My research primarily focuses on **causal inference with observational data**, **graphical models for information selection**, **semiparametric estimation theory**, and **spatial econometrics**. 
 
-My research focuses on integrating causal inference with machine learning models to develop robust, scalable and reliable algorithms that enable decision-making across complex data environments. My PhD work uncovers pathways for identification, partial identification, recovery, robust estimation and stable inference for causal and counterfactual queries in systems affected by preferential selection mechanisms. I apply these methods to assess the impact of ADHD treatment on school performance using observational data.
+I recently completed my **PhD in Statistics at the Department of Mathematics**, Faculty of Mathematics and Natural Sciences ([MatNat](https://www.mn.uio.no/english/)), at the University of Oslo ([UiO](https://www.uio.no/english/)). My academic background also includes:
 
-I hold undergraduate degrees in industrial engineering and economics from Universidad de los Andes ([UniAndes](https://uniandes.edu.co/en)) in Colombia. Moreover, I earned master’s degrees in economics and statistics, the latter from Michigan State University ([MSU](https://msu.edu/)), where I was an international [Fulbright](https://foreign.fulbrightonline.org/) scholar.
+- MSc in Statistics -- Michigan State University ([MSU](https://msu.edu/))
+- MA in Economics -- Universidad de los Andes ([UniAndes](https://uniandes.edu.co/en)) 
+- BA in Economics -- UniAndes
+- BEng in Industrial Engineering -- UniAndes. 
 
-I have professional experience as a research consultant and lead data scientist, where I contributed to projects in areas such as impact evaluation, regional competitiveness, international trade, mobile banking, and alternative credit scoring.
+My professional experience spans roles as a **researcher**, **consultant**, and **lead data scientist**. I have contributed to projects involving: 
 
-## Research
+- the evaluation of benefits from pharmacological treatment for ADHD,
+- the analysis of international trade and investment flows, 
+- the design and evaluation of randomized experiments for mobile banking products, and
+- the quantitative assessment of regional competitiveness, among others.
 
-My research interests and experience include:
-
-- Leveraging graphical criteria to recover causal queries in settings with selection mechanisms
-
-- Constructing partial identification strategies for counterfactual benefit parameters with ordered tiered outcomes
-
-- Developing multiply-robust and efficient estimation procedures grounded in semiparametric theory
-
-- Integrating insights from econometrics, game theory, statistics, and network science to offer new perspectives for motivated applications
-
-## Career
-
--   *2021 - Now*: [**Researcher**]{.underline} at the Norwegian Institute of Public Health ([NIPH](https://www.fhi.no/en/))
-
--   *2020 - 2021*: [**Consultant**]{.underline} (promoted from Summer Intern) at the Inter-American Development Bank ([IADB](https://www.iadb.org/en/about-us/overview))
-
--   *2018 - 2020*: [**Lead Data Scientist**]{.underline} (promoted from Data Scientist) at [Tpaga](https://tpaga.co) (startup)
-
--   *2014 - 2017*: [**Research Consultant**]{.underline} at the Economic Commission for Latin America and the Caribbean ([ECLAC](https://www.cepal.org/en/headquarters-and-offices/eclac-bogota))
 
 ## Scholarships and grants
 
-- *2023*:  **Germany exchange program with the Helmholtz Information & Data Science Academy (HIDA)** --- Norwegian Artificial Intelligence Research Consortium - [NORA](https://www.nora.ai)
+- 2023:  _Germany exchange program with the Helmholtz Information & Data Science Academy (HIDA)_ -- Norwegian Artificial Intelligence Research Consortium - [NORA](https://www.nora.ai)
 
-- *2019 - 2021*:  [**International Fulbright scholar program**](https://foreign.fulbrightonline.org/) --- United States Department of State
+- 2019--2021:  [**International Fulbright scholar program**](https://foreign.fulbrightonline.org/) -- United States Department of State
 
-- *2015-2018*:  **High-level human capital training program for the regions** --- Ministry of Science, Technology and Innovation of Colombia
+- 2015--2018:  _High-level human capital training program for the regions_ -- Ministry of Science, Technology and Innovation of Colombia
 
-- *2008-2012*: **_Quiero Estudiar_ scholarship program** --- Universidad de los Andes
+- 2008--2012: _Quiero Estudiar_ scholarship program -- UniAndes
+
+
