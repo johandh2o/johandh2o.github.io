@@ -61,7 +61,7 @@ $$
 **Research questions**:
 
 - How do the fundamental limits of statistical testability in missing-data models shape identification and inference under $lm$-graphs?   
-- How the existence of context-specific independences (CSI) impact the construction of regular parametric submodels and the feasibility of efficient estimators (e.g., TMLE)?
+- How the existence of context-specific independencies (CSI) impact the construction of regular parametric submodels and the feasibility of efficient estimators (e.g., TMLE)?
 
 
 **Papers**:

@@ -40,5 +40,12 @@
     "title": "Johan de Aguas",
     "section": "Professional experience",
     "text": "Professional experience\nI have worked as a researcher, consultant, and lead data scientist on projects involving:\n\nevaluating the benefits of pharmacological treatment for children with ADHD,\nanalyzing international trade and investment flows,\ndesigning and assessing randomized experiments for mobile banking products, and\nquantitatively benchmarking regional competitiveness."
+  },
+  {
+    "objectID": "presentations.html",
+    "href": "presentations.html",
+    "title": "Presentations",
+    "section": "",
+    "text": "Challenges in causality and where solutions may come from\n\n2025-10-27\nSection 2 Seminar, Department of Mathematics, University of Oslo\n\n\n\n\n\nInferencia causal ante independencias contextuales sobre el mecanismo de datos faltantes\n\n2025-10-26\nSeminario Quantil, Bogotá (Colombia)\n\n\n\n\n\nOptimal transport for policy modification in causal inference\n\n2025-10-07\nSeminar Series in Statistics and Data Science, University of Oslo\n\n\n\n\n\nNovel causal queries and methods (PhD thesis)\n\n2025-06-13\nPhD disputation – thesis\n\n\n\n\n\nInference and estimands under interference in causality (trial)\n\n2025-06-13\nPhD disputation – trial lecture\n\n\n\n\n\nCausal inference amid missingness-specific independencies and mechanism shifts\n\n2025-06-13\nUncertainty in Artificial Intelligence (UAI 2025) – poster\n\n\n\n\n\nThe probability of tiered benefit\n\n2025-05-07\nCausal Learning and Reasoning (CLeaR 2025)\n\n\n\n\n\nRecovering target causal effects from post-exposure selection induced by missing outcome data\n\n2024-04-17\nEuropean Causal Inference Meeting (EuroCIM 2024)"
   }
 ]

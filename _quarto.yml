@@ -11,6 +11,8 @@ website:
         text: Home
       - href: research.qmd
         text: Research
+      - href: presentations.qmd
+        text: Presentations
       - href: "https://johandh2o.github.io/blog/"
         text: Blog
 format:

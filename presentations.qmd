@@ -1,0 +1,89 @@
+---
+title: "Presentations"
+format: html
+fontsize: 11pt
+---
+
+------------------------------------------------------------------------
+
+
+### Challenges in causality and where solutions may come from
+
+- 2025-10-27
+- Section 2 Seminar, Department of Mathematics, University of Oslo
+
+<iframe
+  src="https://drive.google.com/file/d/1pFxLnHYaTe-wLu0n83DfBjEfg-4i8u53/preview"
+  width="75%" height="450" allow="autoplay">
+</iframe>
+
+### Inferencia causal ante independencias contextuales sobre el mecanismo de datos faltantes
+
+- 2025-10-26
+- Seminario Quantil, Bogotá (Colombia)
+
+<iframe
+  src="https://drive.google.com/file/d/1Uap6EOU0R-IGcF3Q8V3yc_VN4W5fzHLf/preview"
+  width="75%" height="450" allow="autoplay">
+</iframe>
+
+### Optimal transport for policy modification in causal inference
+
+- 2025-10-07
+- Seminar Series in Statistics and Data Science, University of Oslo
+
+<iframe
+  src="https://drive.google.com/file/d/1ITHeOCJPwy4mQELhUya2iqK280r3VSQy/preview"
+  width="75%" height="450" allow="autoplay">
+</iframe>
+
+### Novel causal queries and methods (PhD thesis)
+
+- 2025-06-13
+- [PhD disputation -- thesis](https://www.mn.uio.no/math/english/research/news-and-events/events/disputations/2025/Johan%20de%20Aguas)
+
+<iframe
+  src="https://drive.google.com/file/d/1S66Nh6DxPMBee5KBc6J9W-d_Z2pj6QOb/preview"
+  width="75%" height="450" allow="autoplay">
+</iframe>
+
+### Inference and estimands under interference in causality (trial)
+
+- 2025-06-13
+- [PhD disputation -- trial lecture](https://www.mn.uio.no/math/english/research/news-and-events/events/disputations/2025/Johan%20de%20Aguas)
+
+<iframe
+  src="https://drive.google.com/file/d/1tw3xDm1xphXUllIMzNjKsUs2L7zKvSs4/preview"
+  width="75%" height="450" allow="autoplay">
+</iframe>
+
+### Causal inference amid missingness-specific independencies and mechanism shifts 
+
+- 2025-06-13
+- [Uncertainty in Artificial Intelligence (UAI 2025) -- poster](https://www.auai.org/uai2025/)
+
+<iframe
+  src="https://drive.google.com/file/d/1tzTN-Z0jNIuWsvSWxn1l61oIKy_ZbFdy/preview"
+  width="75%" height="650" allow="autoplay">
+</iframe>
+
+### The probability of tiered benefit
+
+- 2025-05-07
+- [Causal Learning and Reasoning (CLeaR 2025)](https://www.cclear.cc/2025)
+
+<iframe
+  src="https://drive.google.com/file/d/1fyW7LPiEx0UkfsfgeTG87LpSkinAWpAG/preview"
+  width="75%" height="450" allow="autoplay">
+</iframe>
+
+### Recovering target causal effects from post-exposure selection induced by missing outcome data
+
+- 2024-04-17
+- [European Causal Inference Meeting (EuroCIM 2024)](https://eurocim.org/copenhagen-2024/)
+
+<iframe
+  src="https://drive.google.com/file/d/1-4UOA6fBYgMaPME7-yRTdNTQdHsEt74P/preview"
+  width="75%" height="450" allow="autoplay">
+</iframe>
+
