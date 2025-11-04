@@ -4,5 +4,29 @@
   },
   "research.qmd": {
     "research.html": "c2723819"
+  },
+  "posts/2023-08-01_missingOutcome/index.qmd": {
+    "index.html": "3ebb2452"
+  },
+  "posts/2024-01-08_EIFTMLE/index.qmd": {
+    "index.html": "945bdfa0"
+  },
+  "posts/2023-09-15_structureUQ/index.qmd": {
+    "index.html": "9f0b910e"
+  },
+  "posts/2023-10-15_grapeSimulation/index.qmd": {
+    "index.html": "650842c6"
+  },
+  "posts/2023-03-01_ipw/index.qmd": {
+    "index.html": "61adf702"
+  },
+  "posts/2023-08-15_missingSimulation/index.qmd": {
+    "index.html": "64d30893"
+  },
+  "posts/2023-09-01_UQcausality/index.qmd": {
+    "index.html": "c2a3660c"
+  },
+  "posts/2024-05-07_lowerBoundPNS/index.qmd": {
+    "index.html": "7b01df55"
   }
 }

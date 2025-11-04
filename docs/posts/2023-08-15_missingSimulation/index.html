@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2023-08-15">
+<meta name="description" content="A simulation exercise on missing data, selection bias, causal inference and TMLE">
+
+<title>Simulation task: recovering causal effects from post-treatment selection induced by missing outcome data – Johan de Aguas</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-9e6471fc7838a385aca4b39307383b6d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="../../site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="../../site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Johan de Aguas</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../research.html"> 
+<span class="menu-text">Research</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#objective" id="toc-objective" class="nav-link active" data-scroll-target="#objective">Objective</a></li>
+  <li><a href="#synthetic-data" id="toc-synthetic-data" class="nav-link" data-scroll-target="#synthetic-data">Synthetic data</a></li>
+  <li><a href="#no-missingness-case" id="toc-no-missingness-case" class="nav-link" data-scroll-target="#no-missingness-case">No missingness case</a></li>
+  <li><a href="#outcome-missingness-mechanisms" id="toc-outcome-missingness-mechanisms" class="nav-link" data-scroll-target="#outcome-missingness-mechanisms">Outcome-missingness mechanisms</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Simulation task: recovering causal effects from post-treatment selection induced by missing outcome data</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">selection bias</div>
+    <div class="quarto-category">mediation</div>
+    <div class="quarto-category">regression</div>
+    <div class="quarto-category">IPW</div>
+    <div class="quarto-category">doubly-robust</div>
+    <div class="quarto-category">TMLE</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    A simulation exercise on missing data, selection bias, causal inference and TMLE
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">August 15, 2023</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<hr>
+<section id="objective" class="level2">
+<h2 class="anchored" data-anchor-id="objective">Objective</h2>
+<p>The final goal is to estimate <span style="color:blue;">the effects of ADHD treatment on school performance</span>, where:</p>
+<ul>
+<li><strong>the estimands</strong>: average treatment effect (ATE) and conditional average treatment effect (CATE)</li>
+<li><strong>the exposure</strong>: stimulant medication for ADHD</li>
+<li><strong>the outcome</strong>: raw score at the mathematics national test at grade 8</li>
+<li><strong>the target population</strong>: ADHD-diagnosed Norwegian schoolchildren between grades 6 and 8</li>
+</ul>
+<p>For this task, we employ:</p>
+<ul>
+<li>The structural causal models (SCM) framework <span class="citation" data-cites="PearlCausality">(<a href="#ref-PearlCausality" role="doc-biblioref">Pearl 2009</a>)</span></li>
+<li>A synthetic <strong>observational</strong> dataset, generated by an SCM learnt from real-world data (functional mechanisms are treated as unknown in the analysis)</li>
+<li>A back-door admissible set of pre-treatment variables; i.e., the assumption of no latent confounding</li>
+<li>A missing-outcome mechanism that allows recoverability via IPW and regression adjustment (functional specification is unknown in the analysis)</li>
+<li>The targeted minimum-loss estimation (TMLE) framework <span class="citation" data-cites="TMLEbook1">(<a href="#ref-TMLEbook1" role="doc-biblioref">van der Laan and Rose 2011</a>)</span></li>
+</ul>
+</section>
+<section id="synthetic-data" class="level2">
+<h2 class="anchored" data-anchor-id="synthetic-data">Synthetic data</h2>
+<p>Let <span class="math inline">\(\mathcal{G}'\)</span> be a directed acyclic graph (DAG) built from domain knowledge and temporal-order constraints, involving the exposure <span class="math inline">\(A\)</span>, the outcome <span class="math inline">\(Y\)</span>, a set of confounders <span class="math inline">\(H\)</span>, and mediators <span class="math inline">\(M\)</span>. We previously fit flexible models (random forests) to learn the causal mechanisms <span class="math inline">\(\hat{f}_V:\text{supp}\, \text{pa}(V;\mathcal{G}')\times \text{supp}\, U_V\rightarrow\text{supp}\, V\)</span> from real-world data on the subject. This allows us to replicate such mechanisms to generate fake data from seeds (noises and exogenous variables) in a controlled environment, along with counterfactual outcomes. In this exercise, exogenous variables mimic the marginal distribution of their real-world counterpart, <span style="color:blue;">but not the joint distribution</span>.</p>
+<blockquote class="blockquote">
+<p>By design, conditional ignorability is satisfied in the synthetic system using the full confounder set. It might not be satisfied in the system where the real-world data come from.</p>
+</blockquote>
+<p>Generated variables can be grouped in three categories:</p>
+<p><strong>1. Pre-treatment / exogenous variables and the exposure</strong>:</p>
+<ul>
+<li><code>mom.vuln</code> = <span class="math inline">\(H_1\in\mathbb{R}\)</span> = maternal <em>vulnerability</em> index: a PCA-based index summarizing mother’s diagnoses (+), level of education (-), age (-), and number of children (-)</li>
+<li><code>sex.girl</code> = <span class="math inline">\(H_2\in\{0,1\}\)</span> = child’s sex at birth, female = 1</li>
+<li><code>med.pre6</code> = <span class="math inline">\(H_3\in\{0,1\}\)</span> = prescription for ADHD medication before grade 6</li>
+<li><code>pre.diag</code> = <span class="math inline">\(H_4\in\{0,1\}\)</span> = diagnoses for comorbid disorders (ADHD-related, internalizing or externalizing) registered before grade 6</li>
+<li><code>ntr.grd5</code> = <span class="math inline">\(H_5\in\mathbb{R}\)</span> = raw score obtained at the national test for grade 5 (average math and reading)</li>
+<li><code>reg.gpsp</code> = <span class="math inline">\(H_6\in\mathbb{N}\)</span> = number of registrations for health services (GP and specialist) before grade 6</li>
+<li><code>med.6to8</code> = <span class="math inline">\(A\in\{0,1\}\)</span> = prescription for ADHD medication between grades 6-8</li>
+</ul>
+<p><strong>2. Mediator variables and the outcome</strong>:</p>
+<ul>
+<li><code>ptr.diag</code> = <span class="math inline">\(M_1\in\{0,1\}\)</span> = diagnoses for comorbid disorders (ADHD-related, internalizing or externalizing) registered between grades 6-8</li>
+<li><code>ptr.gpsp</code> = <span class="math inline">\(M_2\in\mathbb{N}\)</span> = number of registrations for health services (GP and specialist) between grades 6-8</li>
+<li><code>ntr.grd8</code> = <span class="math inline">\(Y\in\mathbb{R}\)</span> = raw score obtained at the national test for grade 8 (math)</li>
+</ul>
+<p><strong>3. Counterfactual variables</strong>:</p>
+<ul>
+<li><code>ptr.diag.cntr</code> = <span class="math inline">\(M_1^{1-A}\)</span> = diagnoses for comorbid disorders (ADHD-related, internalizing or externalizing) registered between grades 6-8, <em>had the individual taken the opposite treatment</em></li>
+<li><code>ptr.gpsp.cntr</code> = <span class="math inline">\(M_2^{1-A}\)</span> = number of registrations for health services (GP and specialist) between grades 6-8, <em>had the individual taken the opposite treatment</em></li>
+<li><code>ntr.grd8.cntr</code> = <span class="math inline">\(Y^{1-A}\)</span> = raw score obtained at the national test for grade 5 (math)</li>
+<li><code>ITE</code> = <span class="math inline">\(Y^{1}-Y^{0}\)</span> = individual treatment effect</li>
+</ul>
+<p>A dataset (<code>synth.data</code>) of <span class="math inline">\(N=5\,000\)</span> samples was generated:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load packages --------------------------------------------------------------</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table)   <span class="co"># Processes dataframes</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'data.table' was built under R version 4.3.3</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)        <span class="co"># Processes dataframes</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kableExtra)   <span class="co"># Styles tables</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(speedglm)     <span class="co"># Performs fast fitting for GLM</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ranger)       <span class="co"># Performs random forest learning</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(nnls)         <span class="co"># Performs non-negative least squares</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Rsolnp)       <span class="co"># Augmented Lagrange optimizer</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sl3)          <span class="co"># Performs super-learning</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tmle3)        <span class="co"># Performs TMLE</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tmle3mediate) <span class="co"># Performs TMLE for mediation analysis</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)      <span class="co"># Plots</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Read data -------------------------------------------------------------------</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="at">file=</span><span class="st">"syntheticADHDdata.RData"</span>)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Glimpse of the data ---------------------------------------------------------</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>synth.data <span class="ot">=</span> <span class="fu">data.table</span>(synth.data)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>synth.data <span class="sc">%&gt;%</span> <span class="fu">head</span>() <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Table 1: A glimpse at the synthetic data"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>Table 1: A glimpse at the synthetic data</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">mom.vuln</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">sex.girl</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">med.pre6</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">pre.diag</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ntr.grd5</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">reg.gpsp</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">med.6to8</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ptr.diag</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ptr.gpsp</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ntr.grd8</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ptr.diag.cntr</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ptr.gpsp.cntr</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ntr.grd8.cntr</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ITE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.65</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">19.64</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">42</td>
+<td style="text-align: right;">16.77</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">44</td>
+<td style="text-align: right;">19.29</td>
+<td style="text-align: right;">2.52</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1.31</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">25.85</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">26.72</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">21.64</td>
+<td style="text-align: right;">5.08</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0.08</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">19.59</td>
+<td style="text-align: right;">56</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">21.38</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">46</td>
+<td style="text-align: right;">23.27</td>
+<td style="text-align: right;">1.89</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.65</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">15.12</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">17.62</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">14.48</td>
+<td style="text-align: right;">3.14</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0.99</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">9.30</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">15.02</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">15.16</td>
+<td style="text-align: right;">0.14</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2.02</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">19.83</td>
+<td style="text-align: right;">128</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">47</td>
+<td style="text-align: right;">19.62</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">75</td>
+<td style="text-align: right;">20.18</td>
+<td style="text-align: right;">0.56</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="no-missingness-case" class="level2">
+<h2 class="anchored" data-anchor-id="no-missingness-case">No missingness case</h2>
+<p>A known SCM allows the computation of unit-level counterfactuals: we can see both worlds at the same time. In particular, we can compute the oracle <em>sample average treatment effect</em> (<span class="math inline">\(^S\)</span>ATE): the within-sample average of the <em>individual treatment effects</em> (unobserved in real-world data). <span class="math display">\[
+^S\text{ATE} = N^{-1}\sum_{i=1}^N \text{ITE}^{(i)} = N^{-1}\sum_{i=1}^N (Y^{(i)}_{A=1}-Y^{(i)}_{A=0})
+\]</span> The <span class="math inline">\(^S\)</span>ATE is itself a consistent (but impossible) estimator of the <em>population</em> ATE (<span class="math inline">\(^P\)</span>ATE).</p>
+<p>Likewise, we can compute the oracle <span class="math inline">\(^S\)</span>CATE for <span class="math inline">\(X\)</span>-specific effects. If <span class="math inline">\(X\)</span> is categorical, we can partition units into strata: <span class="math inline">\(I(x):=\{i\in 1\dots N : X^{(i)}=x\}\)</span>. <span class="math display">\[
+^S\text{CATE}(x) = |I(x)|^{-1}\sum_{i\in I(x)} \text{ITE}^{(i)} = |I(x)|^{-1}\sum_{i\in I(x)} (Y^{(i)}_{A=1}-Y^{(i)}_{A=0})
+\]</span></p>
+<p>Let us compare the oracle effects against the results from two approaches:</p>
+<ul>
+<li><p><span class="math inline">\(t\)</span>-tests comparing the means of raw test scores between treated and non-treated. This estimator would be biased due to confounding</p></li>
+<li><p>The TMLE estimator using <strong>super-learners</strong> <span class="citation" data-cites="superlearners2023">(<a href="#ref-superlearners2023" role="doc-biblioref">Phillips et al. 2023</a>)</span>, combining:</p>
+<ul>
+<li><p>flexible libraries of <strong>base-learners</strong> to model <span class="math inline">\(A\)</span> and <span class="math inline">\(Y\)</span> given confounders <span class="math inline">\(H\)</span>. We employ linear models and random forests (ground-truth DGP is in this model-space)</p></li>
+<li><p><strong>meta-learners</strong>: to ensemble the base-learners together, weighted by their <strong>out-of-sample</strong> (CV) predictive measures to avoid over-fitting (logit for <span class="math inline">\(A\)</span> and NNLS for <span class="math inline">\(Y\)</span>)</p></li>
+</ul></li>
+</ul>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="do">###############################################################################</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Solution via t-tests (biased by confounding)</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="do">###############################################################################</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to generate C.I. data from t-tests ---------------------------------</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Param: pre-treatment binary variable to stratify</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Return: data ready to plot as confidence intervals</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>get.ci.data <span class="ot">=</span> <span class="cf">function</span>(varname){</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Temporal data.frame</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  dplot1 <span class="ot">=</span> synth.data</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  dplot1<span class="sc">$</span>dummy <span class="ot">=</span> dplot1[,<span class="fu">get</span>(varname)]</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Two-sample t-test: biased! -------------------</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># all, med vs no-med</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  ttest.pop <span class="ot">=</span> <span class="fu">t.test</span>(dplot1[med<span class="fl">.6</span>to8<span class="sc">==</span><span class="dv">1</span>, ntr.grd8], <span class="co"># treated</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>                     dplot1[med<span class="fl">.6</span>to8<span class="sc">==</span><span class="dv">0</span>, ntr.grd8]) <span class="co"># control</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  <span class="co"># subpop 0, med vs no-med</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  ttest.sp0 <span class="ot">=</span> <span class="fu">t.test</span>(dplot1[med<span class="fl">.6</span>to8<span class="sc">==</span><span class="dv">1</span> <span class="sc">&amp;</span> dummy<span class="sc">==</span><span class="dv">0</span>, ntr.grd8], <span class="co"># treated (sp 0)</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>                     dplot1[med<span class="fl">.6</span>to8<span class="sc">==</span><span class="dv">0</span> <span class="sc">&amp;</span> dummy<span class="sc">==</span><span class="dv">0</span>, ntr.grd8]) <span class="co"># control (sp 0)</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>  <span class="co"># subpop 1, med vs no-med</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>  ttest.sp1 <span class="ot">=</span> <span class="fu">t.test</span>(dplot1[med<span class="fl">.6</span>to8<span class="sc">==</span><span class="dv">1</span> <span class="sc">&amp;</span> dummy<span class="sc">==</span><span class="dv">1</span>, ntr.grd8], <span class="co"># treated (sp 1)</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>                     dplot1[med<span class="fl">.6</span>to8<span class="sc">==</span><span class="dv">0</span> <span class="sc">&amp;</span> dummy<span class="sc">==</span><span class="dv">1</span>, ntr.grd8]) <span class="co"># control (sp 1)</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>  <span class="co"># One-sample t-test: oracle! -------------------</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>  <span class="co"># oracle ITE, all</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>  otest.pop <span class="ot">=</span> <span class="fu">t.test</span>(dplot1[, ITE])            </span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>  <span class="co"># oracle ITE, subpop 0</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>  otest.sp0 <span class="ot">=</span> <span class="fu">t.test</span>(dplot1[dummy<span class="sc">==</span><span class="dv">0</span>, ITE])    </span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>  <span class="co"># oracle ITE, subpop 1</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>  otest.sp1 <span class="ot">=</span> <span class="fu">t.test</span>(dplot1[dummy<span class="sc">==</span><span class="dv">1</span>, ITE])    </span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>  <span class="co"># data frame put together ----------------------</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>  dplot1 <span class="ot">=</span> <span class="fu">data.table</span>( </span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>    <span class="co"># label for type of analysis</span></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">type =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">'t-test'</span>,<span class="st">'oracle'</span>), <span class="at">each=</span><span class="dv">3</span>),</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>    <span class="co"># label for supopulation</span></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">subpop =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">'all'</span>,<span class="st">'subpop 0'</span>,<span class="st">'subpop 1'</span>), <span class="dv">2</span>),        </span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># lower bound</span></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">low =</span> <span class="fu">c</span>(ttest.pop<span class="sc">$</span>conf.int[<span class="dv">1</span>], ttest.sp0<span class="sc">$</span>conf.int[<span class="dv">1</span>], ttest.sp1<span class="sc">$</span>conf.int[<span class="dv">1</span>],  </span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>            otest.pop<span class="sc">$</span>conf.int[<span class="dv">1</span>], otest.sp0<span class="sc">$</span>conf.int[<span class="dv">1</span>], otest.sp1<span class="sc">$</span>conf.int[<span class="dv">1</span>]),</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>    <span class="co"># upper bound</span></span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">upr =</span> <span class="fu">c</span>(ttest.pop<span class="sc">$</span>conf.int[<span class="dv">2</span>], ttest.sp0<span class="sc">$</span>conf.int[<span class="dv">2</span>], ttest.sp1<span class="sc">$</span>conf.int[<span class="dv">2</span>],  </span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>            otest.pop<span class="sc">$</span>conf.int[<span class="dv">2</span>], otest.sp0<span class="sc">$</span>conf.int[<span class="dv">2</span>], otest.sp1<span class="sc">$</span>conf.int[<span class="dv">2</span>]))</span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>  <span class="co"># add midpoint and return dataframe</span></span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>  dplot1 <span class="ot">=</span> dplot1[, midp <span class="sc">:</span><span class="er">=</span> (low<span class="sc">+</span>upr)<span class="sc">/</span><span class="dv">2</span>] </span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(dplot1)                          </span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a><span class="do">###############################################################################</span></span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a><span class="co"># Solution via adjusted regression / TMLE</span></span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a><span class="do">###############################################################################</span></span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a><span class="co"># Learning algorithms employed to learn treatment/outcome mechanisms -----------</span></span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a><span class="co"># Linear model</span></span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a>lrnr_lm <span class="ot">=</span> <span class="fu">make_learner</span>(Lrnr_glm_fast)</span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a><span class="co"># Random forest model</span></span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>lrnr_rf <span class="ot">=</span> <span class="fu">make_learner</span>(Lrnr_ranger)      </span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a><span class="co"># Meta-learners: to stack together predictions from the learners ---------------</span></span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine Y predictions with non-negative least squares</span></span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a>meta_Y <span class="ot">=</span> <span class="fu">make_learner</span>(Lrnr_nnls)   </span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine A predictions with logit likelihood (augmented Lagrange optimizer)</span></span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a>meta_A <span class="ot">=</span> <span class="fu">make_learner</span>(Lrnr_solnp,                     </span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a>  <span class="at">loss_function =</span> loss_loglik_binomial,              </span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a>  <span class="at">learner_function =</span> metalearner_logistic_binomial)   </span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a><span class="co"># Super-learners: learners + meta-learners together ----------------------------</span></span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a><span class="co"># Outcome super-learning</span></span>
+<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a>super_Y <span class="ot">=</span> Lrnr_sl<span class="sc">$</span><span class="fu">new</span>(<span class="at">learners =</span> <span class="fu">list</span>(lrnr_lm, lrnr_rf), </span>
+<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a>                      <span class="at">metalearner =</span> meta_Y)</span>
+<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a><span class="co"># Exposure super-learning</span></span>
+<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a>super_A <span class="ot">=</span> Lrnr_sl<span class="sc">$</span><span class="fu">new</span>(<span class="at">learners =</span> <span class="fu">list</span>(lrnr_lm, lrnr_rf), </span>
+<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a>                      <span class="at">metalearner =</span> meta_A)</span>
+<span id="cb4-84"><a href="#cb4-84" aria-hidden="true" tabindex="-1"></a><span class="co"># Super-learners put together</span></span>
+<span id="cb4-85"><a href="#cb4-85" aria-hidden="true" tabindex="-1"></a>super_list <span class="ot">=</span> <span class="fu">list</span>(<span class="at">A =</span> super_A,</span>
+<span id="cb4-86"><a href="#cb4-86" aria-hidden="true" tabindex="-1"></a>                  <span class="at">Y =</span> super_Y)              </span>
+<span id="cb4-87"><a href="#cb4-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-88"><a href="#cb4-88" aria-hidden="true" tabindex="-1"></a><span class="co"># Confounder set labels</span></span>
+<span id="cb4-89"><a href="#cb4-89" aria-hidden="true" tabindex="-1"></a>H <span class="ot">=</span> <span class="fu">colnames</span>(synth.data[,<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>])</span>
+<span id="cb4-90"><a href="#cb4-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-91"><a href="#cb4-91" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to generate C.I. data from TMLE--------------------------------------</span></span>
+<span id="cb4-92"><a href="#cb4-92" aria-hidden="true" tabindex="-1"></a><span class="co"># Param: pre-treatment binary variable to stratify</span></span>
+<span id="cb4-93"><a href="#cb4-93" aria-hidden="true" tabindex="-1"></a><span class="co"># Param: data</span></span>
+<span id="cb4-94"><a href="#cb4-94" aria-hidden="true" tabindex="-1"></a><span class="co"># Return: data from confidence intervals</span></span>
+<span id="cb4-95"><a href="#cb4-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-96"><a href="#cb4-96" aria-hidden="true" tabindex="-1"></a>aux_tml_method <span class="ot">=</span> <span class="cf">function</span>(namevar, <span class="at">data=</span>synth.data){</span>
+<span id="cb4-97"><a href="#cb4-97" aria-hidden="true" tabindex="-1"></a>  tmle_CATE <span class="ot">=</span> <span class="fu">tmle3</span>(</span>
+<span id="cb4-98"><a href="#cb4-98" aria-hidden="true" tabindex="-1"></a>  <span class="at">tmle_spec =</span> <span class="fu">tmle_stratified</span>(<span class="fu">tmle_ATE</span>(<span class="dv">1</span>,<span class="dv">0</span>)), <span class="co"># Causal contrast CATE: Y1-Y0</span></span>
+<span id="cb4-99"><a href="#cb4-99" aria-hidden="true" tabindex="-1"></a>  <span class="at">node_list =</span> <span class="fu">list</span>(                           <span class="co"># Variables involved in the query</span></span>
+<span id="cb4-100"><a href="#cb4-100" aria-hidden="true" tabindex="-1"></a>    <span class="at">W =</span> <span class="fu">setdiff</span>(H,namevar),                   <span class="co"># Label for non-stratum confounders</span></span>
+<span id="cb4-101"><a href="#cb4-101" aria-hidden="true" tabindex="-1"></a>    <span class="at">V =</span> namevar,                              <span class="co"># Label for stratifying variable</span></span>
+<span id="cb4-102"><a href="#cb4-102" aria-hidden="true" tabindex="-1"></a>    <span class="at">A =</span> <span class="st">"med.6to8"</span>,                           <span class="co"># Label for exposure</span></span>
+<span id="cb4-103"><a href="#cb4-103" aria-hidden="true" tabindex="-1"></a>    <span class="at">Y =</span> <span class="st">"ntr.grd8"</span>),                          <span class="co"># Label for outcome</span></span>
+<span id="cb4-104"><a href="#cb4-104" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data,                                <span class="co"># Data</span></span>
+<span id="cb4-105"><a href="#cb4-105" aria-hidden="true" tabindex="-1"></a>  <span class="at">learner_list =</span> super_list)                  <span class="co"># Super-learners specified</span></span>
+<span id="cb4-106"><a href="#cb4-106" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(tmle_CATE<span class="sc">$</span>summary)                   <span class="co"># Return summary</span></span>
+<span id="cb4-107"><a href="#cb4-107" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-108"><a href="#cb4-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-109"><a href="#cb4-109" aria-hidden="true" tabindex="-1"></a><span class="do">###############################################################################</span></span>
+<span id="cb4-110"><a href="#cb4-110" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate confidence intervals to plot</span></span>
+<span id="cb4-111"><a href="#cb4-111" aria-hidden="true" tabindex="-1"></a><span class="do">###############################################################################</span></span>
+<span id="cb4-112"><a href="#cb4-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-113"><a href="#cb4-113" aria-hidden="true" tabindex="-1"></a><span class="co"># t-test on prior treatment</span></span>
+<span id="cb4-114"><a href="#cb4-114" aria-hidden="true" tabindex="-1"></a>ttest.med <span class="ot">=</span> <span class="fu">cbind.data.frame</span>(<span class="fu">get.ci.data</span>(<span class="st">'med.pre6'</span>),  <span class="co"># C.I. data</span></span>
+<span id="cb4-115"><a href="#cb4-115" aria-hidden="true" tabindex="-1"></a>                             <span class="at">strata=</span><span class="st">'prior treatment'</span>) <span class="co"># Strata variable</span></span>
+<span id="cb4-116"><a href="#cb4-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-117"><a href="#cb4-117" aria-hidden="true" tabindex="-1"></a><span class="co"># t-test on sex strata</span></span>
+<span id="cb4-118"><a href="#cb4-118" aria-hidden="true" tabindex="-1"></a>ttest.sex <span class="ot">=</span> <span class="fu">cbind.data.frame</span>(<span class="fu">get.ci.data</span>(<span class="st">'sex.girl'</span>), <span class="co"># C.I. data</span></span>
+<span id="cb4-119"><a href="#cb4-119" aria-hidden="true" tabindex="-1"></a>                             <span class="at">strata=</span><span class="st">'sex at birth'</span>)   <span class="co"># Strata variable</span></span>
+<span id="cb4-120"><a href="#cb4-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-121"><a href="#cb4-121" aria-hidden="true" tabindex="-1"></a><span class="co"># TMLE on prior treatment</span></span>
+<span id="cb4-122"><a href="#cb4-122" aria-hidden="true" tabindex="-1"></a>tml.cate.med <span class="ot">=</span> <span class="fu">aux_tml_method</span>(<span class="st">'med.pre6'</span>)                                       <span class="co"># TMLE results</span></span>
+<span id="cb4-123"><a href="#cb4-123" aria-hidden="true" tabindex="-1"></a>tlme.med <span class="ot">=</span> <span class="fu">cbind.data.frame</span>(<span class="at">type=</span><span class="st">'TMLE'</span>,                                        <span class="co"># method label</span></span>
+<span id="cb4-124"><a href="#cb4-124" aria-hidden="true" tabindex="-1"></a>                            <span class="at">subpop=</span><span class="fu">c</span>(<span class="st">'all'</span>,<span class="st">'subpop 0'</span>,<span class="st">'subpop 1'</span>),              <span class="co"># subpop label</span></span>
+<span id="cb4-125"><a href="#cb4-125" aria-hidden="true" tabindex="-1"></a>                            tml.cate.med[<span class="fu">order</span>(tml.cate.med<span class="sc">$</span>param),<span class="fu">c</span>(<span class="dv">9</span>,<span class="dv">10</span>,<span class="dv">8</span>)],  <span class="co"># C.I. data</span></span>
+<span id="cb4-126"><a href="#cb4-126" aria-hidden="true" tabindex="-1"></a>                            <span class="at">strata=</span><span class="st">'prior treatment'</span>)                           <span class="co"># Strata variable</span></span>
+<span id="cb4-127"><a href="#cb4-127" aria-hidden="true" tabindex="-1"></a><span class="co"># TMLE on sex strata</span></span>
+<span id="cb4-128"><a href="#cb4-128" aria-hidden="true" tabindex="-1"></a>tml.cate.sex <span class="ot">=</span> <span class="fu">aux_tml_method</span>(<span class="st">'sex.girl'</span>)                                       <span class="co"># TMLE results</span></span>
+<span id="cb4-129"><a href="#cb4-129" aria-hidden="true" tabindex="-1"></a>tlme.sex <span class="ot">=</span> <span class="fu">cbind.data.frame</span>(<span class="at">type=</span><span class="st">'TMLE'</span>,                                        <span class="co"># method label</span></span>
+<span id="cb4-130"><a href="#cb4-130" aria-hidden="true" tabindex="-1"></a>                            <span class="at">subpop=</span><span class="fu">c</span>(<span class="st">'all'</span>,<span class="st">'subpop 0'</span>,<span class="st">'subpop 1'</span>),              <span class="co"># subpop label</span></span>
+<span id="cb4-131"><a href="#cb4-131" aria-hidden="true" tabindex="-1"></a>                            tml.cate.sex[<span class="fu">order</span>(tml.cate.sex<span class="sc">$</span>param),<span class="fu">c</span>(<span class="dv">9</span>,<span class="dv">10</span>,<span class="dv">8</span>)],  <span class="co"># C.I. data</span></span>
+<span id="cb4-132"><a href="#cb4-132" aria-hidden="true" tabindex="-1"></a>                            <span class="at">strata=</span><span class="st">'sex at birth'</span>)                              <span class="co"># Strata variable</span></span>
+<span id="cb4-133"><a href="#cb4-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-134"><a href="#cb4-134" aria-hidden="true" tabindex="-1"></a><span class="co"># Unify column names</span></span>
+<span id="cb4-135"><a href="#cb4-135" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(tlme.med) <span class="ot">=</span> <span class="fu">colnames</span>(ttest.med)</span>
+<span id="cb4-136"><a href="#cb4-136" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(tlme.sex) <span class="ot">=</span> <span class="fu">colnames</span>(ttest.sex)</span>
+<span id="cb4-137"><a href="#cb4-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-138"><a href="#cb4-138" aria-hidden="true" tabindex="-1"></a><span class="co"># Put all together</span></span>
+<span id="cb4-139"><a href="#cb4-139" aria-hidden="true" tabindex="-1"></a>ci.data<span class="fl">.1</span> <span class="ot">=</span> <span class="fu">rbind.data.frame</span>(ttest.med, ttest.sex, tlme.med, tlme.sex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>The following plot presents the point-estimate and 95% confidence interval for the ATE/CATE resulting from oracle <span class="math inline">\(^S\)</span>ATE/<span class="math inline">\(^S\)</span>CATE, <span class="math inline">\(t\)</span>-tests, and TMLE.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot confidence intervals ---------------------------------------------------</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>ci.data<span class="fl">.1</span> <span class="sc">%&gt;%</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> subpop, <span class="at">y =</span> midp, <span class="at">colour =</span> type)) <span class="sc">+</span>                    </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymax =</span> upr, <span class="at">ymin =</span> low), <span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">position =</span> <span class="fu">position_dodge</span>(<span class="fl">0.9</span>)) <span class="sc">+</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept=</span><span class="dv">0</span>, <span class="at">linetype=</span><span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">'ATE/CATE estimate'</span>,</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">x=</span><span class="st">'Subpopulation (1 = yes prior treatment, 1 = girls)'</span>) <span class="sc">+</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>strata) <span class="sc">+</span> <span class="fu">theme_classic</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>From the previous plot we can infer:</p>
+<p><strong>1. There is some amount of confounding</strong></p>
+<ul>
+<li><p>Confidence intervals from <span class="math inline">\(t\)</span>-tests (<span style="color:green;">green</span>) do not always cover the sample-based oracle value (<span style="color:red;">red</span>). This is probably due to confounding bias, as <span class="math inline">\(t\)</span>-test do not adjust for covariation with <span class="math inline">\(H\)</span></p></li>
+<li><p>In general, confounding bias is negative: unadjusted effects are below the oracle result</p></li>
+<li><p>Confounding bias seems to be particularly problematic when stratifying on prior prescription for ADHD medication, which might be a strong predictor of the exposure</p></li>
+<li><p><span class="math inline">\(t\)</span>-test results might lead to conclude that the treatment is actually <strong>deleterious</strong> for those who had not started it before grade 6 (because of late diagnosis?). In fact, the treatment has positive, but extremely small, average effect in such subpopulation</p></li>
+<li><p><span class="math inline">\(t\)</span>-test results might also lead to conclude that the treatment effect is <strong>insignificant</strong> for boys. In fact, the effect on them is small but positive</p></li>
+</ul>
+<p><strong>2. TMLE with covariate adjustment</strong></p>
+<ul>
+<li><p>Under some mild condition including back-door admissibility of <span class="math inline">\(H\)</span>, TMLE produces consistent estimators. This is, the amount of confounding bias becomes negligible in large finite samples. We can see that confidence intervals from TMLE (<span style="color:blue;">blue</span>) cover the sample-based oracle value (<span style="color:red;">red</span>) in all cases</p></li>
+<li><p>TMLE results lead to correct interpretation of treatment effect for boys and the subpopulation who did not start treatment before grade 6</p></li>
+</ul>
+<p><span style="color:blue;">3. In general, the effects of ADHD treatment on school performance are <strong>positive but small</strong></span></p>
+<ul>
+<li><span style="color:blue;">The estimate ATE is 1.7, on an outcome with mean 21.0 and standard deviation 7.0</span></li>
+</ul>
+</section>
+<section id="outcome-missingness-mechanisms" class="level2">
+<h2 class="anchored" data-anchor-id="outcome-missingness-mechanisms">Outcome-missingness mechanisms</h2>
+<p>Let us simulate the <span class="math inline">\(Y\)</span>-missingness mechanism as a binary random variable <span class="math inline">\(R_Y\)</span>, childless in the associated <span class="math inline">\(m\)</span>-graph <span class="math inline">\(\mathcal{G}\)</span>. For a particular individual <span class="math inline">\(i\)</span>, <span class="math inline">\(R_Y^{(i)}=1\)</span> indicates that its respective outcome realization <span class="math inline">\(Y^{(i)}\)</span> is observed, while <span class="math inline">\(R_Y^{(i)}=0\)</span> signifies <span class="math inline">\(Y^{(i)}\)</span> is missing. This mechanism has a probit specification:</p>
+<p><span class="math display">\[
+R_Y = \mathbb{I}[\theta_0 + \theta_H^\top H + \theta_A A + \theta_M^\top M + U_R &gt; 0],\quad U_R\sim N(0,1)
+\]</span></p>
+<p>Fixing the parameters <span class="math inline">\(\theta\)</span> to certain value (unknown in the analysis), a realization of <span class="math inline">\(U_R\)</span> produces 751 (15%) missing outcomes:</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="do">###############################################################################</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Building an endogenous selection/missingness mechanism</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="do">###############################################################################</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Parameter for the glm-probit specification, only main effects</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">9</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>noise.R <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="at">n=</span><span class="fl">5e3</span>, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>theta.i <span class="ot">=</span> <span class="fl">3.77</span> </span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>theta.c <span class="ot">=</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.01</span>, <span class="sc">-</span><span class="fl">1.97</span>, <span class="sc">-</span><span class="fl">2.03</span>, <span class="fl">0.18</span>, <span class="sc">-</span><span class="fl">0.03</span>, <span class="fl">0.01</span>, <span class="sc">-</span><span class="fl">0.05</span>, <span class="fl">0.64</span>, <span class="sc">-</span><span class="fl">0.01</span>)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>lin.pred <span class="ot">=</span> <span class="fu">as.matrix</span>(synth.data[,<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>]) <span class="sc">%*%</span> theta.c <span class="sc">+</span> theta.i <span class="sc">+</span> noise.R</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Realization of missingness mechanism</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>synth.data<span class="sc">$</span>RY <span class="ot">=</span> <span class="fu">ifelse</span>(lin.pred <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Count how many selected / observed -------------------------------------------</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(synth.data<span class="sc">$</span>RY) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"R(Y)"</span>,<span class="st">"n"</span>),</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Table 2: Missing/selected unit-outcomes"</span>,</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">table.attr =</span> <span class="st">"quarto-disable-processing=true"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<table quarto-disable-processing="true" class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>Table 2: Missing/selected unit-outcomes</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> R(Y) </th>
+   <th style="text-align:right;"> n </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> 0 </td>
+   <td style="text-align:right;"> 751 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1 </td>
+   <td style="text-align:right;"> 4249 </td>
+  </tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Under the TMLE framework, let us first consider four options to recover the ATE/CATE:</p>
+<ol type="1">
+<li><p><span style="color:brown;"><strong>TMLE-cc</strong></span>: TMLE with complete cases. We discard entire units with <span class="math inline">\(R_Y=0\)</span></p>
+<ul>
+<li>This approach would produce a consistent estimator under MCAR. However, as <span class="math inline">\(R_Y\)</span> is MAR in our case, results would be biased</li>
+</ul></li>
+</ol>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">###############################################################################</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Complete-case analysis for TMLE</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="do">###############################################################################</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># TMLE on prior treatment</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>tml.cate.med.cc <span class="ot">=</span> <span class="fu">aux_tml_method</span>(<span class="st">'med.pre6'</span>,                                            </span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">data=</span>synth.data[RY<span class="sc">==</span><span class="dv">1</span>,])                               <span class="co"># TMLE results</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>tlme.med.cc <span class="ot">=</span> <span class="fu">cbind.data.frame</span>(<span class="at">type=</span><span class="st">'TMLE-cc'</span>,                                          <span class="co"># method label</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>                               <span class="at">subpop=</span><span class="fu">c</span>(<span class="st">'all'</span>,<span class="st">'subpop 0'</span>,<span class="st">'subpop 1'</span>),                   <span class="co"># subpop label</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>                               tml.cate.med.cc[<span class="fu">order</span>(tml.cate.med.cc<span class="sc">$</span>param),<span class="fu">c</span>(<span class="dv">9</span>,<span class="dv">10</span>,<span class="dv">8</span>)], <span class="co"># C.I. data</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>                               <span class="at">strata=</span><span class="st">'prior treatment'</span>)                                <span class="co"># Strata variable</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co"># TMLE on sex strata</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>tml.cate.sex.cc <span class="ot">=</span> <span class="fu">aux_tml_method</span>(<span class="st">'sex.girl'</span>,</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">data=</span>synth.data[RY<span class="sc">==</span><span class="dv">1</span>,])                               <span class="co"># TMLE results</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>tlme.sex.cc <span class="ot">=</span> <span class="fu">cbind.data.frame</span>(<span class="at">type=</span><span class="st">'TMLE-cc'</span>,                                          <span class="co"># method label</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>                               <span class="at">subpop=</span><span class="fu">c</span>(<span class="st">'all'</span>,<span class="st">'subpop 0'</span>,<span class="st">'subpop 1'</span>),                   <span class="co"># subpop label</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>                               tml.cate.sex.cc[<span class="fu">order</span>(tml.cate.sex.cc<span class="sc">$</span>param),<span class="fu">c</span>(<span class="dv">9</span>,<span class="dv">10</span>,<span class="dv">8</span>)], <span class="co"># C.I. data</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>                               <span class="at">strata=</span><span class="st">'sex at birth'</span>)                                   <span class="co"># Strata variable</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<ol start="2" type="1">
+<li><p><span style="color:green;"><strong>TMLE-im</strong></span>: TMLE with single median-inputation. We replace <span class="math inline">\(Y^*\)</span> with the median of the observed <span class="math inline">\(Y\)</span></p>
+<ul>
+<li>This approach would also produce biased results, as all missing slots are inputed with the same numeric value independen of <span class="math inline">\(H,A\)</span>. One preferable approach would be <strong>multiple model-based inputations</strong> (consistent under MAR). Yet, single median-inputation is <a href="https://tlverse.org/tmle3/reference/process_missing.html">the built-in preprocessing method in the <code>tmle</code> package</a></li>
+</ul>
+<p><span class="math display">\[
+Y^* \leftarrow \text{med}(Y\mid R_Y=1)
+\]</span></p></li>
+</ol>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="do">###############################################################################</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Median-based single imputation for missing outcome</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="do">###############################################################################</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Replace Y-values for NA whenever R(Y)=0</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>observed.data <span class="ot">=</span> <span class="fu">copy</span>(synth.data)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>observed.data<span class="sc">$</span>ntr.grd8 <span class="ot">=</span> <span class="fu">ifelse</span>(observed.data<span class="sc">$</span>RY<span class="sc">==</span><span class="dv">0</span>, <span class="cn">NA</span>, observed.data<span class="sc">$</span>ntr.grd8)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply process_missing function on TMLE package</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>processed <span class="ot">=</span> <span class="fu">process_missing</span>(observed.data,                     <span class="co"># data</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>                            <span class="at">node_list =</span> <span class="fu">list</span>(<span class="at">W =</span> H,            <span class="co"># confounders</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>                                             <span class="at">A =</span> <span class="st">"med.6to8"</span>,   <span class="co"># exposure</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>                                             <span class="at">Y =</span> <span class="st">"ntr.grd8"</span>),  <span class="co"># outcome</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>                            <span class="at">complete_nodes =</span> <span class="fu">c</span>(<span class="st">'W'</span>,<span class="st">'A'</span>))       <span class="co"># complete variables</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co"># TMLE on prior treatment</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>tml.cate.med.im <span class="ot">=</span> <span class="fu">aux_tml_method</span>(<span class="st">'med.pre6'</span>,</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">data=</span>processed<span class="sc">$</span>data)                                   <span class="co"># TMLE results</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>tlme.med.im <span class="ot">=</span> <span class="fu">cbind.data.frame</span>(<span class="at">type=</span><span class="st">'TMLE-im'</span>,                                          <span class="co"># method label</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>                               <span class="at">subpop=</span><span class="fu">c</span>(<span class="st">'all'</span>,<span class="st">'subpop 0'</span>,<span class="st">'subpop 1'</span>),                   <span class="co"># subpop label</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>                               tml.cate.med.im[<span class="fu">order</span>(tml.cate.med.im<span class="sc">$</span>param),<span class="fu">c</span>(<span class="dv">9</span>,<span class="dv">10</span>,<span class="dv">8</span>)], <span class="co"># C.I. data</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>                               <span class="at">strata=</span><span class="st">'prior treatment'</span>)                                <span class="co"># Strata variable</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co"># TMLE on sex strata</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>tml.cate.sex.im <span class="ot">=</span> <span class="fu">aux_tml_method</span>(<span class="st">'sex.girl'</span>,</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">data=</span>processed<span class="sc">$</span>data)                                   <span class="co"># TMLE results</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>tlme.sex.im <span class="ot">=</span> <span class="fu">cbind.data.frame</span>(<span class="at">type=</span><span class="st">'TMLE-im'</span>,                                          <span class="co"># method label</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>                               <span class="at">subpop=</span><span class="fu">c</span>(<span class="st">'all'</span>,<span class="st">'subpop 0'</span>,<span class="st">'subpop 1'</span>),                   <span class="co"># subpop label</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>                               tml.cate.sex.im[<span class="fu">order</span>(tml.cate.sex.im<span class="sc">$</span>param),<span class="fu">c</span>(<span class="dv">9</span>,<span class="dv">10</span>,<span class="dv">8</span>)], <span class="co"># C.I. data</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>                               <span class="at">strata=</span><span class="st">'sex at birth'</span>)                                   <span class="co"># Strata variable</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Unify column names</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(tlme.med.cc) <span class="ot">=</span> <span class="fu">colnames</span>(ttest.med)</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(tlme.sex.cc) <span class="ot">=</span> <span class="fu">colnames</span>(ttest.sex)</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(tlme.med.im) <span class="ot">=</span> <span class="fu">colnames</span>(ttest.med)</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(tlme.sex.im) <span class="ot">=</span> <span class="fu">colnames</span>(ttest.sex)</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="co"># Put all together</span></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>ci.data<span class="fl">.2</span> <span class="ot">=</span> <span class="fu">rbind.data.frame</span>(ttest.med[ttest.med<span class="sc">$</span>type<span class="sc">==</span><span class="st">'oracle'</span>,],</span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>                             ttest.sex[ttest.sex<span class="sc">$</span>type<span class="sc">==</span><span class="st">'oracle'</span>,],</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>                             tlme.med.cc, tlme.sex.cc,</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>                             tlme.med.im, tlme.sex.im)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<ol start="3" type="1">
+<li><p><span style="color:blue;"><strong>TMLE-mm</strong></span>: TMLE with explicit model for <span class="math inline">\(M\)</span> (only considering <code>ptr.diag</code>)</p>
+<ul>
+<li>Let us assume we are sure that post-treatment diagnoses (<code>ptr.diag</code>) have a direct effect on attrition, but post-treatment visits (<code>ptr.gpsp</code>) do not. Since the variable <code>ptr.diag</code> is binary, we can pose an explicit model using a superlearner based on logistic regression. If such assumption is sound, this approach should remove most of the selection bias.</li>
+</ul>
+<p><span class="math display">\[
+\begin{aligned}
+&amp;\text{Outcome model on selected } &amp; Q_1(H,A,M) = \mathbb{E}[Y\mid H,A,M,R_Y=1] &amp; \\
+&amp;\text{M-model (\texttt{ptr.diag})}  &amp; m(H,A) = \mathbb{P}[M=1\mid H,A] &amp;\\
+&amp;\text{M-averaged expected outcome}  &amp; Q_2(H,a) = m(H,a)Q_1(H,a,1) +(1-m(H,a))Q_1(H,a,0) &amp;\\
+&amp;\text{Initial ATE} &amp;  \psi_0 = \mathbb{E}_H\Delta_a Q_2(H,a)&amp;\\
+&amp;\text{Propensity score (nuisance)}  &amp; e(H) = \mathbb{P}[A=1\mid H] &amp;\\
+&amp;\text{Selection score (nuisance)}  &amp; s(H,A,M) = \mathbb{P}[R_Y=1\mid H,A,M] &amp;\\
+\end{aligned}
+\]</span></p></li>
+</ol>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="do">###############################################################################</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Recovering causal effect via regression and explicit M-model</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="do">###############################################################################</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># The library of base learners: GAM and random forests</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>stack <span class="ot">=</span> Stack<span class="sc">$</span><span class="fu">new</span>(Lrnr_gam<span class="sc">$</span><span class="fu">new</span>(), Lrnr_ranger<span class="sc">$</span><span class="fu">new</span>())</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Super-learner for continuous outcome: NNLS</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>superl <span class="ot">=</span> Lrnr_sl<span class="sc">$</span><span class="fu">new</span>(<span class="at">learners =</span> stack, <span class="at">metalearner =</span> Lrnr_nnls<span class="sc">$</span><span class="fu">new</span>())</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Super-learner for binary variables: default logit</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>superb <span class="ot">=</span> Lrnr_sl<span class="sc">$</span><span class="fu">new</span>(<span class="at">learners =</span> stack)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to generate C.I. data from TMLE--------------------------------------</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Param: pre-treatment binary variable to stratify</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Param: data</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Return: data from confidence intervals</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>aux_tml_method_mmod <span class="ot">=</span> <span class="cf">function</span>(namevar, input.data){</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Remove namevar from adjustment set</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>  H <span class="ot">=</span> <span class="fu">setdiff</span>(H, namevar)</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Learning the Q-function ---------------------------------------------------</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Training task for Q, fit superlearner </span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>  <span class="co"># on selected-outcome data, including M1 as predictors</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>  train.Q <span class="ot">=</span> <span class="fu">make_sl3_Task</span>(</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> input.data[RY<span class="sc">==</span><span class="dv">1</span>,],</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">outcome =</span> <span class="st">'ntr.grd8'</span>,</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">covariates =</span> <span class="fu">c</span>(H,<span class="st">'med.6to8'</span>,<span class="st">'ptr.diag'</span>)</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>  Q_fit <span class="ot">=</span> superl<span class="sc">$</span><span class="fu">train</span>(<span class="at">task =</span> train.Q)</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Training task for M, all data</span></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>  train.M <span class="ot">=</span> <span class="fu">make_sl3_Task</span>(</span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> input.data,</span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">outcome =</span> <span class="st">'ptr.diag'</span>,</span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">covariates =</span> <span class="fu">c</span>(H,<span class="st">'med.6to8'</span>)</span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>  M_fit <span class="ot">=</span> superb<span class="sc">$</span><span class="fu">train</span>(<span class="at">task =</span> train.M)</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Case A=1 ------------------------------------------------------------------</span></span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Data to make counterfactual predictions </span></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>  temp.dt <span class="ot">=</span> <span class="fu">copy</span>(input.data)</span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Prediction task for p(M=1 |A=1)</span></span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>  temp.dt<span class="sc">$</span>med<span class="fl">.6</span>to8 <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>  pred.M <span class="ot">=</span> <span class="fu">make_sl3_Task</span>(</span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> temp.dt,</span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>    <span class="at">outcome =</span> <span class="st">'ptr.diag'</span>,</span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">covariates =</span> <span class="fu">c</span>(H,<span class="st">'med.6to8'</span>)</span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>  pM <span class="ot">=</span> M_fit<span class="sc">$</span><span class="fu">predict</span>(<span class="at">task =</span> pred.M)</span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Prediction task for E(Y |A=1, M=1)</span></span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a>  temp.dt<span class="sc">$</span>ptr.diag <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>  pred.Q1 <span class="ot">=</span> <span class="fu">make_sl3_Task</span>(</span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> temp.dt,</span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a>    <span class="at">outcome =</span> <span class="st">'ntr.grd8'</span>,</span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>    <span class="at">covariates =</span> <span class="fu">c</span>(H,<span class="st">'med.6to8'</span>,<span class="st">'ptr.diag'</span>)</span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Prediction task for E(Y |A=1, M=0)</span></span>
+<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a>  temp.dt<span class="sc">$</span>ptr.diag <span class="ot">=</span> <span class="dv">0</span></span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a>  pred.Q0 <span class="ot">=</span> <span class="fu">make_sl3_Task</span>(</span>
+<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> temp.dt,</span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a>    <span class="at">outcome =</span> <span class="st">'ntr.grd8'</span>,</span>
+<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a>    <span class="at">covariates =</span> <span class="fu">c</span>(H,<span class="st">'med.6to8'</span>,<span class="st">'ptr.diag'</span>)</span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Save INTEGRAL dP(M |A=1) E(Y |A=1, M)</span></span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a>  input.data<span class="sc">$</span>Q_1m <span class="ot">=</span> pM <span class="sc">*</span> Q_fit<span class="sc">$</span><span class="fu">predict</span>(<span class="at">task =</span> pred.Q1) <span class="sc">+</span></span>
+<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a>    (<span class="dv">1</span><span class="sc">-</span>pM) <span class="sc">*</span> Q_fit<span class="sc">$</span><span class="fu">predict</span>(<span class="at">task =</span> pred.Q0)</span>
+<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Case A=0 ------------------------------------------------------------------</span></span>
+<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Prediction task for p(M=1 |A=0)</span></span>
+<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a>  temp.dt<span class="sc">$</span>med<span class="fl">.6</span>to8 <span class="ot">=</span> <span class="dv">0</span></span>
+<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a>  pred.M <span class="ot">=</span> <span class="fu">make_sl3_Task</span>(</span>
+<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> temp.dt,</span>
+<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a>    <span class="at">outcome =</span> <span class="st">'ptr.diag'</span>,</span>
+<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a>    <span class="at">covariates =</span> <span class="fu">c</span>(H,<span class="st">'med.6to8'</span>)</span>
+<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a>  pM <span class="ot">=</span> M_fit<span class="sc">$</span><span class="fu">predict</span>(<span class="at">task =</span> pred.M)</span>
+<span id="cb9-87"><a href="#cb9-87" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-88"><a href="#cb9-88" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Prediction task for E(Y |A=0, M=1)</span></span>
+<span id="cb9-89"><a href="#cb9-89" aria-hidden="true" tabindex="-1"></a>  temp.dt<span class="sc">$</span>ptr.diag <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb9-90"><a href="#cb9-90" aria-hidden="true" tabindex="-1"></a>  pred.Q1 <span class="ot">=</span> <span class="fu">make_sl3_Task</span>(</span>
+<span id="cb9-91"><a href="#cb9-91" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> temp.dt,</span>
+<span id="cb9-92"><a href="#cb9-92" aria-hidden="true" tabindex="-1"></a>    <span class="at">outcome =</span> <span class="st">'ntr.grd8'</span>,</span>
+<span id="cb9-93"><a href="#cb9-93" aria-hidden="true" tabindex="-1"></a>    <span class="at">covariates =</span> <span class="fu">c</span>(H,<span class="st">'med.6to8'</span>,<span class="st">'ptr.diag'</span>)</span>
+<span id="cb9-94"><a href="#cb9-94" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-95"><a href="#cb9-95" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-96"><a href="#cb9-96" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Prediction task for E(Y |A=0, M=0)</span></span>
+<span id="cb9-97"><a href="#cb9-97" aria-hidden="true" tabindex="-1"></a>  temp.dt<span class="sc">$</span>ptr.diag <span class="ot">=</span> <span class="dv">0</span></span>
+<span id="cb9-98"><a href="#cb9-98" aria-hidden="true" tabindex="-1"></a>  pred.Q0 <span class="ot">=</span> <span class="fu">make_sl3_Task</span>(</span>
+<span id="cb9-99"><a href="#cb9-99" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> temp.dt,</span>
+<span id="cb9-100"><a href="#cb9-100" aria-hidden="true" tabindex="-1"></a>    <span class="at">outcome =</span> <span class="st">'ntr.grd8'</span>,</span>
+<span id="cb9-101"><a href="#cb9-101" aria-hidden="true" tabindex="-1"></a>    <span class="at">covariates =</span> <span class="fu">c</span>(H,<span class="st">'med.6to8'</span>,<span class="st">'ptr.diag'</span>)</span>
+<span id="cb9-102"><a href="#cb9-102" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-103"><a href="#cb9-103" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-104"><a href="#cb9-104" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Save INTEGRAL dP(M |A=0) E(Y |A=0, M)</span></span>
+<span id="cb9-105"><a href="#cb9-105" aria-hidden="true" tabindex="-1"></a>  input.data<span class="sc">$</span>Q_0m <span class="ot">=</span> pM <span class="sc">*</span> Q_fit<span class="sc">$</span><span class="fu">predict</span>(<span class="at">task =</span> pred.Q1) <span class="sc">+</span></span>
+<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a>    (<span class="dv">1</span><span class="sc">-</span>pM) <span class="sc">*</span> Q_fit<span class="sc">$</span><span class="fu">predict</span>(<span class="at">task =</span> pred.Q0)</span>
+<span id="cb9-107"><a href="#cb9-107" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-108"><a href="#cb9-108" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Save Qm as the M-average of Q1 and Q0</span></span>
+<span id="cb9-109"><a href="#cb9-109" aria-hidden="true" tabindex="-1"></a>  input.data[,Qm <span class="sc">:</span><span class="er">=</span> med<span class="fl">.6</span>to8<span class="sc">*</span>Q_1m <span class="sc">+</span> (<span class="dv">1</span><span class="sc">-</span>med<span class="fl">.6</span>to8)<span class="sc">*</span>Q_0m]</span>
+<span id="cb9-110"><a href="#cb9-110" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-111"><a href="#cb9-111" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Nuisance parameters: A  ----------------------------------------------------</span></span>
+<span id="cb9-112"><a href="#cb9-112" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-113"><a href="#cb9-113" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Training task for A, fit superlearner </span></span>
+<span id="cb9-114"><a href="#cb9-114" aria-hidden="true" tabindex="-1"></a>  train.A <span class="ot">=</span> <span class="fu">make_sl3_Task</span>(</span>
+<span id="cb9-115"><a href="#cb9-115" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> input.data,</span>
+<span id="cb9-116"><a href="#cb9-116" aria-hidden="true" tabindex="-1"></a>    <span class="at">outcome =</span> <span class="st">'med.6to8'</span>,</span>
+<span id="cb9-117"><a href="#cb9-117" aria-hidden="true" tabindex="-1"></a>    <span class="at">covariates =</span> H</span>
+<span id="cb9-118"><a href="#cb9-118" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-119"><a href="#cb9-119" aria-hidden="true" tabindex="-1"></a>  A_fit <span class="ot">=</span> superb<span class="sc">$</span><span class="fu">train</span>(<span class="at">task =</span> train.A)</span>
+<span id="cb9-120"><a href="#cb9-120" aria-hidden="true" tabindex="-1"></a>  input.data<span class="sc">$</span>p.score <span class="ot">=</span> A_fit<span class="sc">$</span><span class="fu">predict</span>(<span class="at">task =</span> train.A)</span>
+<span id="cb9-121"><a href="#cb9-121" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-122"><a href="#cb9-122" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Nuisance parameters: R(Y)  -------------------------------------------------</span></span>
+<span id="cb9-123"><a href="#cb9-123" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-124"><a href="#cb9-124" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Training task for R(Y), fit superlearner </span></span>
+<span id="cb9-125"><a href="#cb9-125" aria-hidden="true" tabindex="-1"></a>  train.R <span class="ot">=</span> <span class="fu">make_sl3_Task</span>(</span>
+<span id="cb9-126"><a href="#cb9-126" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> input.data,</span>
+<span id="cb9-127"><a href="#cb9-127" aria-hidden="true" tabindex="-1"></a>    <span class="at">outcome =</span> <span class="st">'RY'</span>,</span>
+<span id="cb9-128"><a href="#cb9-128" aria-hidden="true" tabindex="-1"></a>    <span class="at">covariates =</span> <span class="fu">c</span>(H,<span class="st">'med.6to8'</span>,<span class="st">'ptr.diag'</span>)</span>
+<span id="cb9-129"><a href="#cb9-129" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-130"><a href="#cb9-130" aria-hidden="true" tabindex="-1"></a>  R_fit <span class="ot">=</span> superb<span class="sc">$</span><span class="fu">train</span>(<span class="at">task =</span> train.R)</span>
+<span id="cb9-131"><a href="#cb9-131" aria-hidden="true" tabindex="-1"></a>  input.data<span class="sc">$</span>p.select <span class="ot">=</span> R_fit<span class="sc">$</span><span class="fu">predict</span>(<span class="at">task =</span> train.R)</span>
+<span id="cb9-132"><a href="#cb9-132" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-133"><a href="#cb9-133" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Count parameters  ---------------------------------------------------------</span></span>
+<span id="cb9-134"><a href="#cb9-134" aria-hidden="true" tabindex="-1"></a>  N <span class="ot">=</span> <span class="fu">nrow</span>(input.data)</span>
+<span id="cb9-135"><a href="#cb9-135" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">=</span> <span class="fu">nrow</span>(input.data[RY<span class="sc">==</span><span class="dv">1</span>,])</span>
+<span id="cb9-136"><a href="#cb9-136" aria-hidden="true" tabindex="-1"></a>  r <span class="ot">=</span> n<span class="sc">/</span>N</span>
+<span id="cb9-137"><a href="#cb9-137" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-138"><a href="#cb9-138" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Nuisance parameters: R(Y)  ---------------------------------------------------</span></span>
+<span id="cb9-139"><a href="#cb9-139" aria-hidden="true" tabindex="-1"></a>  input.data[, H<span class="sc">:</span><span class="er">=</span> r<span class="sc">/</span>(p.select) <span class="sc">*</span> (med<span class="fl">.6</span>to8<span class="sc">/</span>p.score <span class="sc">-</span> (<span class="dv">1</span><span class="sc">-</span>med<span class="fl">.6</span>to8)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>p.score)) ]</span>
+<span id="cb9-140"><a href="#cb9-140" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-141"><a href="#cb9-141" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Updating model  ---------------------------------------------------</span></span>
+<span id="cb9-142"><a href="#cb9-142" aria-hidden="true" tabindex="-1"></a>  updating <span class="ot">=</span> <span class="fu">lm</span>(ntr.grd8 <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> <span class="fu">offset</span>(Qm) <span class="sc">+</span> H, <span class="at">data=</span>input.data)</span>
+<span id="cb9-143"><a href="#cb9-143" aria-hidden="true" tabindex="-1"></a>  eps <span class="ot">=</span> <span class="fu">as.numeric</span>(<span class="fu">coef</span>(updating))</span>
+<span id="cb9-144"><a href="#cb9-144" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-145"><a href="#cb9-145" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Update Q-values</span></span>
+<span id="cb9-146"><a href="#cb9-146" aria-hidden="true" tabindex="-1"></a>  input.data[, Q_1f<span class="sc">:</span><span class="er">=</span> Q_1m <span class="sc">+</span> eps <span class="sc">*</span> r<span class="sc">/</span>(p.select<span class="sc">*</span>p.score)]</span>
+<span id="cb9-147"><a href="#cb9-147" aria-hidden="true" tabindex="-1"></a>  input.data[, Q_0f<span class="sc">:</span><span class="er">=</span> Q_0m <span class="sc">-</span> eps <span class="sc">*</span> r<span class="sc">/</span>(p.select<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>p.score))]</span>
+<span id="cb9-148"><a href="#cb9-148" aria-hidden="true" tabindex="-1"></a>  input.data[, D<span class="sc">:</span><span class="er">=</span> H<span class="sc">*</span>(ntr.grd8 <span class="sc">-</span> Qm) <span class="sc">+</span> Q_1m <span class="sc">-</span> Q_0m]</span>
+<span id="cb9-149"><a href="#cb9-149" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-150"><a href="#cb9-150" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Compute ATE, standard errors and CI</span></span>
+<span id="cb9-151"><a href="#cb9-151" aria-hidden="true" tabindex="-1"></a>  ate <span class="ot">=</span> <span class="fu">mean</span>(input.data<span class="sc">$</span>Q_1f <span class="sc">-</span> input.data<span class="sc">$</span>Q_0f)</span>
+<span id="cb9-152"><a href="#cb9-152" aria-hidden="true" tabindex="-1"></a>  ate.se <span class="ot">=</span> <span class="fu">sd</span>(input.data<span class="sc">$</span>D, <span class="at">na.rm=</span>T)<span class="sc">/</span><span class="fu">sqrt</span>(n)</span>
+<span id="cb9-153"><a href="#cb9-153" aria-hidden="true" tabindex="-1"></a>  ate.lo <span class="ot">=</span> ate <span class="sc">-</span> <span class="fu">qnorm</span>(<span class="fl">0.975</span>)<span class="sc">*</span>ate.se</span>
+<span id="cb9-154"><a href="#cb9-154" aria-hidden="true" tabindex="-1"></a>  ate.up <span class="ot">=</span> ate <span class="sc">+</span> <span class="fu">qnorm</span>(<span class="fl">0.975</span>)<span class="sc">*</span>ate.se</span>
+<span id="cb9-155"><a href="#cb9-155" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-156"><a href="#cb9-156" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Return CI</span></span>
+<span id="cb9-157"><a href="#cb9-157" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">c</span>(ate.lo, ate.up, ate))</span>
+<span id="cb9-158"><a href="#cb9-158" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-159"><a href="#cb9-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-160"><a href="#cb9-160" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate CI data</span></span>
+<span id="cb9-161"><a href="#cb9-161" aria-hidden="true" tabindex="-1"></a>ate <span class="ot">=</span> <span class="fu">aux_tml_method_mmod</span>(<span class="st">''</span>, observed.data)</span>
+<span id="cb9-162"><a href="#cb9-162" aria-hidden="true" tabindex="-1"></a>cate.nop <span class="ot">=</span>  <span class="fu">aux_tml_method_mmod</span>(<span class="st">'med.pre6'</span>, observed.data[med.pre6<span class="sc">==</span><span class="dv">0</span>,])</span>
+<span id="cb9-163"><a href="#cb9-163" aria-hidden="true" tabindex="-1"></a>cate.yes <span class="ot">=</span>  <span class="fu">aux_tml_method_mmod</span>(<span class="st">'med.pre6'</span>, observed.data[med.pre6<span class="sc">==</span><span class="dv">1</span>,])</span>
+<span id="cb9-164"><a href="#cb9-164" aria-hidden="true" tabindex="-1"></a>cate.boy <span class="ot">=</span>  <span class="fu">aux_tml_method_mmod</span>(<span class="st">'sex.girl'</span>, observed.data[sex.girl<span class="sc">==</span><span class="dv">0</span>,])</span>
+<span id="cb9-165"><a href="#cb9-165" aria-hidden="true" tabindex="-1"></a>cate.grl <span class="ot">=</span>  <span class="fu">aux_tml_method_mmod</span>(<span class="st">'sex.girl'</span>, observed.data[sex.girl<span class="sc">==</span><span class="dv">1</span>,])</span>
+<span id="cb9-166"><a href="#cb9-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-167"><a href="#cb9-167" aria-hidden="true" tabindex="-1"></a><span class="co"># Put all together</span></span>
+<span id="cb9-168"><a href="#cb9-168" aria-hidden="true" tabindex="-1"></a>ci.data<span class="fl">.3</span> <span class="ot">=</span> ci.data[<span class="dv">13</span><span class="sc">:</span><span class="dv">18</span>,]</span>
+<span id="cb9-169"><a href="#cb9-169" aria-hidden="true" tabindex="-1"></a>ci.data<span class="fl">.3</span><span class="sc">$</span>type <span class="ot">=</span> <span class="st">'TMLE-mm'</span></span>
+<span id="cb9-170"><a href="#cb9-170" aria-hidden="true" tabindex="-1"></a>ci.data<span class="fl">.3</span><span class="sc">$</span>midp <span class="ot">=</span> <span class="fu">c</span>(ate[<span class="dv">3</span>], cate.nop[<span class="dv">3</span>], cate.yes[<span class="dv">3</span>], ate[<span class="dv">3</span>], cate.boy[<span class="dv">3</span>], cate.grl[<span class="dv">3</span>])</span>
+<span id="cb9-171"><a href="#cb9-171" aria-hidden="true" tabindex="-1"></a>ci.data<span class="fl">.3</span><span class="sc">$</span>low <span class="ot">=</span> <span class="fu">c</span>(ate[<span class="dv">1</span>], cate.nop[<span class="dv">1</span>], cate.yes[<span class="dv">1</span>], ate[<span class="dv">1</span>], cate.boy[<span class="dv">1</span>], cate.grl[<span class="dv">1</span>])</span>
+<span id="cb9-172"><a href="#cb9-172" aria-hidden="true" tabindex="-1"></a>ci.data<span class="fl">.3</span><span class="sc">$</span>upr <span class="ot">=</span> <span class="fu">c</span>(ate[<span class="dv">2</span>], cate.nop[<span class="dv">2</span>], cate.yes[<span class="dv">2</span>], ate[<span class="dv">2</span>], cate.boy[<span class="dv">2</span>], cate.grl[<span class="dv">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<ol start="4" type="1">
+<li><p><span style="color:purple;"><strong>TMLE-nr</strong></span>: TMLE with nested regressions.</p>
+<ul>
+<li>Let us assume we are sure that post-treatment diagnoses (<code>ptr.diag</code>) have a direct effect on attrition, but post-treatment visits (<code>ptr.gpsp</code>) do not. Since the variable <code>ptr.diag</code> is binary, we can pose an explicit model using a superlearner based on logistic regression. If such assumption is sound, this approach should remove most of the selection bias.</li>
+</ul>
+<p><span class="math display">\[
+\begin{aligned}
+&amp;\text{Outcome model on selected } &amp; Q_1(H,A,M) = \mathbb{E}[Y\mid H,A,M,R_Y=1] &amp; \\
+&amp;\text{High-level regression}  &amp; Q_2(H,a) = \mathbb{E}[\hat{Q}_1\mid H,A=a] &amp;\\
+&amp;\text{Initial ATE} &amp;  \psi_0 = \mathbb{E}_H\Delta_a Q_2(H,a)&amp;\\
+&amp;\text{Propensity score (nuisance)}  &amp; e(H) = \mathbb{P}[A=1\mid H] &amp;\\
+&amp;\text{Selection score (nuisance)}  &amp; s(H,A,M) = \mathbb{P}[R_Y=1\mid H,A,M] &amp;\\
+\end{aligned}
+\]</span></p></li>
+</ol>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="do">###############################################################################</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Recovering causal effect via nested regressions</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="do">###############################################################################</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to generate C.I. data from TMLE--------------------------------------</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Param: pre-treatment binary variable to stratify</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Param: data</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Return: data from confidence intervals</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>aux_tml_method_nest <span class="ot">=</span> <span class="cf">function</span>(namevar, input.data){</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Remove namevar from adjustment set</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  H <span class="ot">=</span> <span class="fu">setdiff</span>(H, namevar)</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Learning the Q-function ---------------------------------------------------</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Training task for Q, fit superlearner </span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># on selected-outcome data, including M1 as predictors</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  train.Q <span class="ot">=</span> <span class="fu">make_sl3_Task</span>(</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> input.data[RY<span class="sc">==</span><span class="dv">1</span>,],</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">outcome =</span> <span class="st">'ntr.grd8'</span>,</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">covariates =</span> <span class="fu">c</span>(H,<span class="st">'med.6to8'</span>,<span class="st">'ptr.diag'</span>,<span class="st">'ptr.gpsp'</span>)</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>  Q_fit <span class="ot">=</span> superl<span class="sc">$</span><span class="fu">train</span>(<span class="at">task =</span> train.Q)</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Data to make counterfactual predictions </span></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>  temp.dt <span class="ot">=</span> <span class="fu">copy</span>(input.data)</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Prediction task for E(Y |A=1, M)</span></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>  temp.dt<span class="sc">$</span>med<span class="fl">.6</span>to8 <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>  pred.Q1 <span class="ot">=</span> <span class="fu">make_sl3_Task</span>(</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> temp.dt,</span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">outcome =</span> <span class="st">'ntr.grd8'</span>,</span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">covariates =</span> <span class="fu">c</span>(H,<span class="st">'med.6to8'</span>,<span class="st">'ptr.diag'</span>,<span class="st">'ptr.gpsp'</span>)</span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>  input.data<span class="sc">$</span>Q1.pred <span class="ot">=</span> Q_fit<span class="sc">$</span><span class="fu">predict</span>(<span class="at">task =</span> pred.Q1)</span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Prediction task for E(Y |A=0, M)</span></span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>  temp.dt<span class="sc">$</span>med<span class="fl">.6</span>to8 <span class="ot">=</span> <span class="dv">0</span></span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>  pred.Q0 <span class="ot">=</span> <span class="fu">make_sl3_Task</span>(</span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> temp.dt,</span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">outcome =</span> <span class="st">'ntr.grd8'</span>,</span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">covariates =</span> <span class="fu">c</span>(H,<span class="st">'med.6to8'</span>,<span class="st">'ptr.diag'</span>,<span class="st">'ptr.gpsp'</span>)</span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>  input.data<span class="sc">$</span>Q0.pred <span class="ot">=</span> Q_fit<span class="sc">$</span><span class="fu">predict</span>(<span class="at">task =</span> pred.Q0)</span>
+<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Training task for Q21</span></span>
+<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a>  train.Q21 <span class="ot">=</span> <span class="fu">make_sl3_Task</span>(</span>
+<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> input.data,</span>
+<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">outcome =</span> <span class="st">'Q1.pred'</span>,</span>
+<span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a>    <span class="at">covariates =</span> H <span class="co"># No treatment in here, its fixed</span></span>
+<span id="cb10-55"><a href="#cb10-55" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-56"><a href="#cb10-56" aria-hidden="true" tabindex="-1"></a>  Q21_fit <span class="ot">=</span> superl<span class="sc">$</span><span class="fu">train</span>(<span class="at">task =</span> train.Q21)</span>
+<span id="cb10-57"><a href="#cb10-57" aria-hidden="true" tabindex="-1"></a>  input.data<span class="sc">$</span>Q1.fin <span class="ot">=</span> Q21_fit<span class="sc">$</span><span class="fu">predict</span>(<span class="at">task =</span> train.Q21)</span>
+<span id="cb10-58"><a href="#cb10-58" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-59"><a href="#cb10-59" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Training task for Q20</span></span>
+<span id="cb10-60"><a href="#cb10-60" aria-hidden="true" tabindex="-1"></a>  train.Q20 <span class="ot">=</span> <span class="fu">make_sl3_Task</span>(</span>
+<span id="cb10-61"><a href="#cb10-61" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> input.data,</span>
+<span id="cb10-62"><a href="#cb10-62" aria-hidden="true" tabindex="-1"></a>    <span class="at">outcome =</span> <span class="st">'Q0.pred'</span>,</span>
+<span id="cb10-63"><a href="#cb10-63" aria-hidden="true" tabindex="-1"></a>    <span class="at">covariates =</span> H <span class="co"># No treatment in here, its fixed</span></span>
+<span id="cb10-64"><a href="#cb10-64" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-65"><a href="#cb10-65" aria-hidden="true" tabindex="-1"></a>  Q20_fit <span class="ot">=</span> superl<span class="sc">$</span><span class="fu">train</span>(<span class="at">task =</span> train.Q20)</span>
+<span id="cb10-66"><a href="#cb10-66" aria-hidden="true" tabindex="-1"></a>  input.data<span class="sc">$</span>Q0.fin <span class="ot">=</span> Q20_fit<span class="sc">$</span><span class="fu">predict</span>(<span class="at">task =</span> train.Q20)</span>
+<span id="cb10-67"><a href="#cb10-67" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-68"><a href="#cb10-68" aria-hidden="true" tabindex="-1"></a>  <span class="co"># m-Average</span></span>
+<span id="cb10-69"><a href="#cb10-69" aria-hidden="true" tabindex="-1"></a>  input.data[, Qa<span class="sc">:</span><span class="er">=</span> med<span class="fl">.6</span>to8<span class="sc">*</span>Q1.fin <span class="sc">+</span> (<span class="dv">1</span><span class="sc">-</span>med<span class="fl">.6</span>to8)<span class="sc">*</span>Q0.fin]</span>
+<span id="cb10-70"><a href="#cb10-70" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-71"><a href="#cb10-71" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Nuisance parameters: A  ----------------------------------------------------</span></span>
+<span id="cb10-72"><a href="#cb10-72" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-73"><a href="#cb10-73" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Training task for A, fit superlearner </span></span>
+<span id="cb10-74"><a href="#cb10-74" aria-hidden="true" tabindex="-1"></a>  train.A <span class="ot">=</span> <span class="fu">make_sl3_Task</span>(</span>
+<span id="cb10-75"><a href="#cb10-75" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> input.data,</span>
+<span id="cb10-76"><a href="#cb10-76" aria-hidden="true" tabindex="-1"></a>    <span class="at">outcome =</span> <span class="st">'med.6to8'</span>,</span>
+<span id="cb10-77"><a href="#cb10-77" aria-hidden="true" tabindex="-1"></a>    <span class="at">covariates =</span> H</span>
+<span id="cb10-78"><a href="#cb10-78" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-79"><a href="#cb10-79" aria-hidden="true" tabindex="-1"></a>  A_fit <span class="ot">=</span> superb<span class="sc">$</span><span class="fu">train</span>(<span class="at">task =</span> train.A)</span>
+<span id="cb10-80"><a href="#cb10-80" aria-hidden="true" tabindex="-1"></a>  input.data<span class="sc">$</span>p.score <span class="ot">=</span> A_fit<span class="sc">$</span><span class="fu">predict</span>(<span class="at">task =</span> train.A)</span>
+<span id="cb10-81"><a href="#cb10-81" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-82"><a href="#cb10-82" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Nuisance parameters: R(Y)  -------------------------------------------------</span></span>
+<span id="cb10-83"><a href="#cb10-83" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-84"><a href="#cb10-84" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Training task for R(Y), fit superlearner </span></span>
+<span id="cb10-85"><a href="#cb10-85" aria-hidden="true" tabindex="-1"></a>  train.R <span class="ot">=</span> <span class="fu">make_sl3_Task</span>(</span>
+<span id="cb10-86"><a href="#cb10-86" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> input.data,</span>
+<span id="cb10-87"><a href="#cb10-87" aria-hidden="true" tabindex="-1"></a>    <span class="at">outcome =</span> <span class="st">'RY'</span>,</span>
+<span id="cb10-88"><a href="#cb10-88" aria-hidden="true" tabindex="-1"></a>    <span class="at">covariates =</span> <span class="fu">c</span>(H,<span class="st">'med.6to8'</span>,<span class="st">'ptr.diag'</span>)</span>
+<span id="cb10-89"><a href="#cb10-89" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-90"><a href="#cb10-90" aria-hidden="true" tabindex="-1"></a>  R_fit <span class="ot">=</span> superb<span class="sc">$</span><span class="fu">train</span>(<span class="at">task =</span> train.R)</span>
+<span id="cb10-91"><a href="#cb10-91" aria-hidden="true" tabindex="-1"></a>  input.data<span class="sc">$</span>p.select <span class="ot">=</span> R_fit<span class="sc">$</span><span class="fu">predict</span>(<span class="at">task =</span> train.R)</span>
+<span id="cb10-92"><a href="#cb10-92" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-93"><a href="#cb10-93" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Count parameters  ---------------------------------------------------------</span></span>
+<span id="cb10-94"><a href="#cb10-94" aria-hidden="true" tabindex="-1"></a>  N <span class="ot">=</span> <span class="fu">nrow</span>(input.data)</span>
+<span id="cb10-95"><a href="#cb10-95" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">=</span> <span class="fu">nrow</span>(input.data[RY<span class="sc">==</span><span class="dv">1</span>,])</span>
+<span id="cb10-96"><a href="#cb10-96" aria-hidden="true" tabindex="-1"></a>  r <span class="ot">=</span> n<span class="sc">/</span>N</span>
+<span id="cb10-97"><a href="#cb10-97" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-98"><a href="#cb10-98" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Nuisance parameters: R(Y)  ---------------------------------------------------</span></span>
+<span id="cb10-99"><a href="#cb10-99" aria-hidden="true" tabindex="-1"></a>  input.data[, H<span class="sc">:</span><span class="er">=</span> r<span class="sc">/</span>(p.select) <span class="sc">*</span> (med<span class="fl">.6</span>to8<span class="sc">/</span>p.score <span class="sc">-</span> (<span class="dv">1</span><span class="sc">-</span>med<span class="fl">.6</span>to8)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>p.score)) ]</span>
+<span id="cb10-100"><a href="#cb10-100" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-101"><a href="#cb10-101" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Updating model  ---------------------------------------------------</span></span>
+<span id="cb10-102"><a href="#cb10-102" aria-hidden="true" tabindex="-1"></a>  updating <span class="ot">=</span> <span class="fu">lm</span>(ntr.grd8 <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> <span class="fu">offset</span>(Qa) <span class="sc">+</span> H, <span class="at">data=</span>input.data)</span>
+<span id="cb10-103"><a href="#cb10-103" aria-hidden="true" tabindex="-1"></a>  eps <span class="ot">=</span> <span class="fu">as.numeric</span>(<span class="fu">coef</span>(updating))</span>
+<span id="cb10-104"><a href="#cb10-104" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-105"><a href="#cb10-105" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Update Q-values</span></span>
+<span id="cb10-106"><a href="#cb10-106" aria-hidden="true" tabindex="-1"></a>  input.data[, Q_1f<span class="sc">:</span><span class="er">=</span> Q1.fin <span class="sc">+</span> eps <span class="sc">*</span> r<span class="sc">/</span>(p.select<span class="sc">*</span>p.score)]</span>
+<span id="cb10-107"><a href="#cb10-107" aria-hidden="true" tabindex="-1"></a>  input.data[, Q_0f<span class="sc">:</span><span class="er">=</span> Q0.fin <span class="sc">-</span> eps <span class="sc">*</span> r<span class="sc">/</span>(p.select<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>p.score))]</span>
+<span id="cb10-108"><a href="#cb10-108" aria-hidden="true" tabindex="-1"></a>  input.data[, D<span class="sc">:</span><span class="er">=</span> H<span class="sc">*</span>(ntr.grd8 <span class="sc">-</span> Qa) <span class="sc">+</span> Q1.fin <span class="sc">-</span> Q0.fin]</span>
+<span id="cb10-109"><a href="#cb10-109" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-110"><a href="#cb10-110" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Compute ATE, standard errors and CI</span></span>
+<span id="cb10-111"><a href="#cb10-111" aria-hidden="true" tabindex="-1"></a>  ate <span class="ot">=</span> <span class="fu">mean</span>(input.data<span class="sc">$</span>Q_1f <span class="sc">-</span> input.data<span class="sc">$</span>Q_0f)</span>
+<span id="cb10-112"><a href="#cb10-112" aria-hidden="true" tabindex="-1"></a>  ate.se <span class="ot">=</span> <span class="fu">sd</span>(input.data<span class="sc">$</span>D, <span class="at">na.rm=</span>T)<span class="sc">/</span><span class="fu">sqrt</span>(n)</span>
+<span id="cb10-113"><a href="#cb10-113" aria-hidden="true" tabindex="-1"></a>  ate.lo <span class="ot">=</span> ate <span class="sc">-</span> <span class="fu">qnorm</span>(<span class="fl">0.975</span>)<span class="sc">*</span>ate.se</span>
+<span id="cb10-114"><a href="#cb10-114" aria-hidden="true" tabindex="-1"></a>  ate.up <span class="ot">=</span> ate <span class="sc">+</span> <span class="fu">qnorm</span>(<span class="fl">0.975</span>)<span class="sc">*</span>ate.se</span>
+<span id="cb10-115"><a href="#cb10-115" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-116"><a href="#cb10-116" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Return CI</span></span>
+<span id="cb10-117"><a href="#cb10-117" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">c</span>(ate.lo, ate.up, ate))</span>
+<span id="cb10-118"><a href="#cb10-118" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb10-119"><a href="#cb10-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-120"><a href="#cb10-120" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate CI data</span></span>
+<span id="cb10-121"><a href="#cb10-121" aria-hidden="true" tabindex="-1"></a>ate <span class="ot">=</span> <span class="fu">aux_tml_method_nest</span>(<span class="st">''</span>, observed.data)</span>
+<span id="cb10-122"><a href="#cb10-122" aria-hidden="true" tabindex="-1"></a>cate.nop <span class="ot">=</span>  <span class="fu">aux_tml_method_nest</span>(<span class="st">'med.pre6'</span>, observed.data[med.pre6<span class="sc">==</span><span class="dv">0</span>,])</span>
+<span id="cb10-123"><a href="#cb10-123" aria-hidden="true" tabindex="-1"></a>cate.yes <span class="ot">=</span>  <span class="fu">aux_tml_method_nest</span>(<span class="st">'med.pre6'</span>, observed.data[med.pre6<span class="sc">==</span><span class="dv">1</span>,])</span>
+<span id="cb10-124"><a href="#cb10-124" aria-hidden="true" tabindex="-1"></a>cate.boy <span class="ot">=</span>  <span class="fu">aux_tml_method_nest</span>(<span class="st">'sex.girl'</span>, observed.data[sex.girl<span class="sc">==</span><span class="dv">0</span>,])</span>
+<span id="cb10-125"><a href="#cb10-125" aria-hidden="true" tabindex="-1"></a>cate.grl <span class="ot">=</span>  <span class="fu">aux_tml_method_nest</span>(<span class="st">'sex.girl'</span>, observed.data[sex.girl<span class="sc">==</span><span class="dv">1</span>,])</span>
+<span id="cb10-126"><a href="#cb10-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-127"><a href="#cb10-127" aria-hidden="true" tabindex="-1"></a><span class="co"># Put all together</span></span>
+<span id="cb10-128"><a href="#cb10-128" aria-hidden="true" tabindex="-1"></a>ci.data<span class="fl">.4</span> <span class="ot">=</span> ci.data[<span class="dv">13</span><span class="sc">:</span><span class="dv">18</span>,]</span>
+<span id="cb10-129"><a href="#cb10-129" aria-hidden="true" tabindex="-1"></a>ci.data<span class="fl">.4</span><span class="sc">$</span>type <span class="ot">=</span> <span class="st">'TMLE-nr'</span></span>
+<span id="cb10-130"><a href="#cb10-130" aria-hidden="true" tabindex="-1"></a>ci.data<span class="fl">.4</span><span class="sc">$</span>midp <span class="ot">=</span> <span class="fu">c</span>(ate[<span class="dv">3</span>], cate.nop[<span class="dv">3</span>], cate.yes[<span class="dv">3</span>], ate[<span class="dv">3</span>], cate.boy[<span class="dv">3</span>], cate.grl[<span class="dv">3</span>])</span>
+<span id="cb10-131"><a href="#cb10-131" aria-hidden="true" tabindex="-1"></a>ci.data<span class="fl">.4</span><span class="sc">$</span>low <span class="ot">=</span> <span class="fu">c</span>(ate[<span class="dv">1</span>], cate.nop[<span class="dv">1</span>], cate.yes[<span class="dv">1</span>], ate[<span class="dv">1</span>], cate.boy[<span class="dv">1</span>], cate.grl[<span class="dv">1</span>])</span>
+<span id="cb10-132"><a href="#cb10-132" aria-hidden="true" tabindex="-1"></a>ci.data<span class="fl">.4</span><span class="sc">$</span>upr <span class="ot">=</span> <span class="fu">c</span>(ate[<span class="dv">2</span>], cate.nop[<span class="dv">2</span>], cate.yes[<span class="dv">2</span>], ate[<span class="dv">2</span>], cate.boy[<span class="dv">2</span>], cate.grl[<span class="dv">2</span>])</span>
+<span id="cb10-133"><a href="#cb10-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-134"><a href="#cb10-134" aria-hidden="true" tabindex="-1"></a><span class="co"># All methods together</span></span>
+<span id="cb10-135"><a href="#cb10-135" aria-hidden="true" tabindex="-1"></a>ci.data <span class="ot">=</span> <span class="fu">rbind</span>(ci.data<span class="fl">.2</span>, ci.data<span class="fl">.3</span>, ci.data<span class="fl">.4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>The following plot presents the point-estimate and 95% confidence interval from the approaches presented above:</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot confidence intervals ---------------------------------------------------</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rbind</span>(ci.data) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> subpop, <span class="at">y =</span> midp, <span class="at">colour =</span> type)) <span class="sc">+</span>                    </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymax =</span> upr, <span class="at">ymin =</span> low), <span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">position =</span> <span class="fu">position_dodge</span>(<span class="fl">0.9</span>)) <span class="sc">+</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept=</span><span class="dv">0</span>, <span class="at">linetype=</span><span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">'ATE/CATE estimate'</span>,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">x=</span><span class="st">'Subpopulation (1 = yes prior treatment, 1 = girls)'</span>) <span class="sc">+</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>strata) <span class="sc">+</span> <span class="fu">theme_classic</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Regression adjustment works</strong></p>
+<ul>
+<li>Confidence intervals from complete-case analysis (<span style="color:brown;">brown</span>) and single median-inputations (<span style="color:green;">green</span>) fail to cover the oracle SATE (<span style="color:red;">red</span>) in most cases, particularly for the population ATE.</li>
+<li>A regression-based solution via an explicit model for <code>ptr.diag</code> (<span style="color:blue;">blue</span>) does a better job, and only struggle with small subpopulations in the data (no prior treatment or girls, about 30%).</li>
+<li>A nested-regressions approach (<span style="color:purple;">purple</span>) performs well for the ATE, but struggle a little with small subpopulations.</li>
+</ul>
+<p>All methods above via TMLE employ only one fluctuation parameter (on <span class="math inline">\(Q_2\)</span>). Better performance can be obtained by working with a fluctuation parameter on <span class="math inline">\(Q_1\)</span> or <span class="math inline">\(p(M\mid H,A)\)</span> as well, and by incorporating smart cross-fitting schemes.</p>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-PearlCausality" class="csl-entry" role="listitem">
+Pearl, Judea. 2009. <em>Causality: Models, Reasoning, and Inference</em>. 2nd ed. Cambridge, UK: Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511803161">https://doi.org/10.1017/CBO9780511803161</a>.
+</div>
+<div id="ref-superlearners2023" class="csl-entry" role="listitem">
+Phillips, Rachael V, Mark J van der Laan, Hana Lee, and Susan Gruber. 2023. <span>“<span class="nocase">Practical considerations for specifying a super learner</span>.”</span> <em>International Journal of Epidemiology</em> 52 (4): 1276–85. <a href="https://doi.org/10.1093/ije/dyad023">https://doi.org/10.1093/ije/dyad023</a>.
+</div>
+<div id="ref-TMLEbook1" class="csl-entry" role="listitem">
+van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference for Observational and Experimental Data</em>. Springer Series in Statistics. Springer New York. <a href="https://books.google.no/books?id=RGnSX5aCAgQC">https://books.google.no/books?id=RGnSX5aCAgQC</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

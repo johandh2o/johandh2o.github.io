@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2023-08-01">
+<meta name="description" content="Solutions to the problem of effect recoverability from selection/missingness via regression adjustment and doubly-robust estimation">
+
+<title>Recovering causal effects from post-treatment selection induced by missing outcome data – Johan de Aguas</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-9e6471fc7838a385aca4b39307383b6d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="../../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Johan de Aguas</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../research.html"> 
+<span class="menu-text">Research</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#objective" id="toc-objective" class="nav-link active" data-scroll-target="#objective">Objective</a></li>
+  <li><a href="#conceptual-diagrams" id="toc-conceptual-diagrams" class="nav-link" data-scroll-target="#conceptual-diagrams">Conceptual diagrams</a></li>
+  <li><a href="#setting" id="toc-setting" class="nav-link" data-scroll-target="#setting">Setting</a></li>
+  <li><a href="#the-problem-of-identifiability" id="toc-the-problem-of-identifiability" class="nav-link" data-scroll-target="#the-problem-of-identifiability">The problem of identifiability</a></li>
+  <li><a href="#the-problem-of-recoverability" id="toc-the-problem-of-recoverability" class="nav-link" data-scroll-target="#the-problem-of-recoverability">The problem of recoverability</a>
+  <ul class="collapse">
+  <li><a href="#recoverability-via-ipw" id="toc-recoverability-via-ipw" class="nav-link" data-scroll-target="#recoverability-via-ipw">Recoverability via IPW</a></li>
+  <li><a href="#recoverability-via-regression-adjustment" id="toc-recoverability-via-regression-adjustment" class="nav-link" data-scroll-target="#recoverability-via-regression-adjustment">Recoverability via regression adjustment</a></li>
+  <li><a href="#recoverability-via-mediation-analysis" id="toc-recoverability-via-mediation-analysis" class="nav-link" data-scroll-target="#recoverability-via-mediation-analysis">Recoverability via mediation analysis</a></li>
+  <li><a href="#multiply-robustness" id="toc-multiply-robustness" class="nav-link" data-scroll-target="#multiply-robustness">Multiply-robustness</a></li>
+  </ul></li>
+  <li><a href="#path-forward" id="toc-path-forward" class="nav-link" data-scroll-target="#path-forward">Path forward</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Recovering causal effects from post-treatment selection induced by missing outcome data</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">selection bias</div>
+    <div class="quarto-category">mediation</div>
+    <div class="quarto-category">regression</div>
+    <div class="quarto-category">IPW</div>
+    <div class="quarto-category">doubly-robust</div>
+    <div class="quarto-category">TMLE</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    Solutions to the problem of effect recoverability from selection/missingness via regression adjustment and doubly-robust estimation
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">August 1, 2023</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<hr>
+<section id="objective" class="level2">
+<h2 class="anchored" data-anchor-id="objective">Objective</h2>
+<p>The final goal is to estimate the average treatment effect (ATE) and conditional average treatment effect (CATE) using <strong>observational data with missing values on the outcome variable</strong></p>
+</section>
+<section id="conceptual-diagrams" class="level2">
+<h2 class="anchored" data-anchor-id="conceptual-diagrams">Conceptual diagrams</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+  A["Observed-data
+  distribution"] -- "recovery" --&gt; B["Underlying
+  distribution"]
+  B -- "identification" --&gt; C["Causal effect"]
+  A -- "recovery" --&gt; C
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>Diagram 1: relation between identifiability and recoverability:</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+  D["Graphical
+  criteria"] ==&gt; E["IPW"]
+  D ==&gt; F["Regression"]
+  D -.-&gt; M["Mediation
+  analysis"]
+  F --&gt; G["M-model"]
+  F ==&gt; H["Nested"]
+  E ==&gt; I["Doubly-
+  robustness"]
+  F ==&gt; I
+  I -.-&gt; J["AIPW"]
+  I ==&gt; K["TMLE"]
+  I -.-&gt; L["DML"]
+  M -.-&gt; N["Triply-
+  robustness"]
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>Diagram 2: relation between recoverability criteria and some estimation procedures:</p>
+</section>
+<section id="setting" class="level2">
+<h2 class="anchored" data-anchor-id="setting">Setting</h2>
+<p>Consider the following <span class="math inline">\(m\)</span>-graph<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>, <span class="math inline">\(\mathcal{G}\)</span>, representing the causal relations among a set of random variables <span class="math inline">\(\mathcal{V}=\{H,A,M,Y,R_Y\}\)</span>, where:</p>
+<ul>
+<li><span class="math inline">\(H\in\mathbb{R}^d\)</span> is a vector of pre-treatment and context covariates</li>
+<li><span class="math inline">\(A\in\{0,1\}\)</span> is a binary exposure</li>
+<li><span class="math inline">\(Y\)</span> is the outcome of interest, with general support (univariate or multivariate, discrete or continuous)</li>
+<li><span class="math inline">\(M\)</span> is a mediator on the causal pathway from <span class="math inline">\(A\)</span> to <span class="math inline">\(Y\)</span>, with general support</li>
+<li><span class="math inline">\(R_Y\in\{0,1\}\)</span> is an indicator of sample selection for <span class="math inline">\(Y\)</span>, i.e., for a given sample, <span class="math inline">\(R_Y=1\)</span> means <span class="math inline">\(Y\)</span> is observed; otherwise <span class="math inline">\(Y\)</span> is missing (denoted with proxy <span class="math inline">\(Y^*=\emptyset\)</span>).</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="mdag1.png" class="img-fluid figure-img" width="250"></p>
+<figcaption>Figure 1: <span class="math inline">\(m\)</span>-graph <span class="math inline">\(\mathcal{G}\)</span></figcaption>
+</figure>
+</div>
+<p>Our goal is to estimate the average treatment effect (ATE), <span class="math inline">\(\psi\)</span>, <strong>in the target population</strong>, defined as:</p>
+<p><span id="eq-1"><span class="math display">\[
+\psi = \Delta_a\mathbb{E}[Y\mid do(A=a)] := \mathbb{E}[Y\mid do(A=1)]-\mathbb{E}[Y\mid do(A=0)]
+\tag{1}\]</span></span></p>
+</section>
+<section id="the-problem-of-identifiability" class="level2">
+<h2 class="anchored" data-anchor-id="the-problem-of-identifiability">The problem of identifiability</h2>
+<p>When there is no sample selection nor missingness, or when missing is <em>completely at random</em> (MCAR), all arrows pointing to <span class="math inline">\(R_Y\)</span> are absent. The <span class="math inline">\(m\)</span>-graph representing the system correspond to a causal graph <span class="math inline">\(\mathcal{G}'\equiv\mathcal{G}[\overline{R_Y}]\)</span>, and samples are obtained from the observational distribution <span class="math inline">\(P(H,A,M,Y)\)</span>. This is the traditional setting motivating causal inference with observational data.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="mdag2.png" class="img-fluid figure-img" width="250"></p>
+<figcaption>Figure 2: causal graph <span class="math inline">\(\mathcal{G}'\equiv\mathcal{G}[\overline{R_Y}]\)</span></figcaption>
+</figure>
+</div>
+<p>Under the assumptions embedded in the causal graph <span class="math inline">\(\mathcal{G}'\)</span>, and a special mutilation known as the <em>back-door graph</em> <span class="math inline">\(\mathcal{G}'[A\!-\!Y]\)</span><a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>, <span class="math inline">\(\psi\)</span> is <em>nonparametrically identifiable</em> from <span class="math inline">\(P(H,A,M,Y)\)</span> via the <em>back-door formula</em> <span class="citation" data-cites="Pearl1995 PearlDo">(<a href="#ref-Pearl1995" role="doc-biblioref">Pearl 1995</a>, <a href="#ref-PearlDo" role="doc-biblioref">2012</a>)</span>, as:</p>
+<p><span id="eq-2"><span class="math display">\[
+\psi = \Delta_a\mathbb{E}_H\mathbb{E}[Y\mid H,A=a]
+\tag{2}\]</span></span></p>
+<p>Given identifiability plus <span class="math inline">\(N\)</span> i.i.d. samples from <span class="math inline">\(P(H,A,M,Y)\)</span>, a consistent estimator can be constructed using a regression model for the outcome <span class="math inline">\(\hat{Q}(H,A)=\hat{\mathbb{E}}[Y\mid H,A]\)</span>, and then proceeding with <span class="math inline">\(g\)</span>-computation <span class="citation" data-cites="robins1986gcomp">(<a href="#ref-robins1986gcomp" role="doc-biblioref">Robins 1986</a>)</span>:</p>
+<p><span id="eq-3"><span class="math display">\[
+\hat{\psi} = N^{-1}\sum_{i=1}^{N}\Delta_a\hat{Q}(H_i,a)
+\tag{3}\]</span></span></p>
+</section>
+<section id="the-problem-of-recoverability" class="level2">
+<h2 class="anchored" data-anchor-id="the-problem-of-recoverability">The problem of recoverability</h2>
+<p>A (causal) parameter is said to be <strong>recoverable</strong> from the observed-data distribution <span class="math inline">\(P(H,A,M,Y^*,R_Y)\)</span> <a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> if it can be uniquely computed from it using the assumptions embedded in <span class="math inline">\(\mathcal{G}\)</span> (and the necessary graph mutilation).</p>
+<p>Under identifiability in the substantive model <a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>, there is an ample number of methods to recover joint/conditional distributions based on different statistical theories. Although not originally motivated by graphical models, they can be seen as <em>ad hoc</em> solutions under special graphical conditions <span class="citation" data-cites="mgraphs">(<a href="#ref-mgraphs" role="doc-biblioref">Mohan and Pearl 2021</a>)</span>.</p>
+<p>Table 1 presents a summary of literature review <a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a> benchmarking four methodological approaches in terms of:</p>
+<ul>
+<li><span style="color:blue;">Graphical conditions for recoveravility</span>: from hard (<span class="math inline">\(\bigstar\)</span>) to easy (<span class="math inline">\(\bigstar\bigstar\bigstar\)</span>) to fulfill/believe</li>
+<li><span style="color:blue;">Flexibility in model specification</span>: from parametric (<span class="math inline">\(\bigstar\)</span>) to ML/nonparametric (<span class="math inline">\(\bigstar\bigstar\bigstar\)</span>)</li>
+<li><span style="color:blue;">Statistical efficiency</span>: from wider (<span class="math inline">\(\bigstar\)</span>) to narrower (<span class="math inline">\(\bigstar\bigstar\bigstar\)</span>) confidence/credible intervals</li>
+<li><span style="color:blue;">Computational efficiency</span>: from slow (<span class="math inline">\(\bigstar\)</span>) to fast (<span class="math inline">\(\bigstar\bigstar\bigstar\)</span>) computation/convergence</li>
+</ul>
+<table class="caption-top table">
+<caption>Table 1: some statistical methods to address selection/missingness</caption>
+<colgroup>
+<col style="width: 40%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 15%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Graph cond.</th>
+<th>Flex. spec.</th>
+<th>Stat. eff.</th>
+<th>Comp. eff.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Expectation-maximization <span class="citation" data-cites="DEMP1977">(<a href="#ref-DEMP1977" role="doc-biblioref">Dempster, Laird, and Rubin 1977</a>)</span></td>
+<td><span class="math inline">\(\bigstar\)</span></td>
+<td><span class="math inline">\(\bigstar\)</span></td>
+<td><span class="math inline">\(\bigstar\bigstar\star\)</span></td>
+<td><span class="math inline">\(\bigstar\)</span></td>
+</tr>
+<tr class="even">
+<td>Multiple imputation <span class="citation" data-cites="Rubin1976 RubinMIpaper">(<a href="#ref-Rubin1976" role="doc-biblioref">Rubin 1976</a>, <a href="#ref-RubinMIpaper" role="doc-biblioref">1978</a>)</span></td>
+<td><span class="math inline">\(\bigstar\star\)</span></td>
+<td><span class="math inline">\(\bigstar\bigstar\bigstar\)</span></td>
+<td><span class="math inline">\(\bigstar\bigstar\)</span></td>
+<td><span class="math inline">\(\bigstar\bigstar\)</span></td>
+</tr>
+<tr class="odd">
+<td>Inverse probability weighting <span class="citation" data-cites="robins1992recovery Robins1994">(<a href="#ref-robins1992recovery" role="doc-biblioref">Robins and Rotnitzky 1992</a>; <a href="#ref-Robins1994" role="doc-biblioref">Robins, Rotnitzky, and Zhao 1994</a>)</span></td>
+<td><span class="math inline">\(\bigstar\bigstar\bigstar\)</span></td>
+<td><span class="math inline">\(\bigstar\bigstar\)</span></td>
+<td><span class="math inline">\(\bigstar\)</span></td>
+<td><span class="math inline">\(\bigstar\bigstar\bigstar\)</span></td>
+</tr>
+<tr class="even">
+<td>Regression adjustment <span class="citation" data-cites="Bareinboim_Tian_Pearl_2014 Correa_Tian_Bareinboim_2018">(<a href="#ref-Bareinboim_Tian_Pearl_2014" role="doc-biblioref">Bareinboim, Tian, and Pearl 2014</a>; <a href="#ref-Correa_Tian_Bareinboim_2018" role="doc-biblioref">J. Correa, Tian, and Bareinboim 2018</a>)</span></td>
+<td><span class="math inline">\(\bigstar\bigstar\)</span></td>
+<td><span class="math inline">\(\bigstar\bigstar\bigstar\)</span></td>
+<td><span class="math inline">\(\bigstar\bigstar\bigstar\)</span></td>
+<td><span class="math inline">\(\bigstar\bigstar\bigstar\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Arguably, the best set of properties come from IPW and regression adjustment, due to their direct derivation from graphical criteria, which might extend the Rubin-MAR setting. Moreover, both solutions have important theoretical results from the theory of semiparametric estimation, and produce <strong>doubly-robustness</strong> when combined. These reasons have motivated syncretic estimators, such as:</p>
+<table class="caption-top table">
+<caption>Table 2: some doubly-robust estimation methods</caption>
+<colgroup>
+<col style="width: 44%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Fast consistency</th>
+<th>Plug-in for target</th>
+<th>Bayesian version</th>
+<th># iter. steps</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Augmented inverse probability weighting (AIPW) <span class="citation" data-cites="Robins1994">(<a href="#ref-Robins1994" role="doc-biblioref">Robins, Rotnitzky, and Zhao 1994</a>)</span></td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td>Targeted learning <span class="citation" data-cites="TMLEbook1">(<a href="#ref-TMLEbook1" role="doc-biblioref">van der Laan and Rose 2011</a>)</span></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes, kinda</td>
+<td><span class="math inline">\(\geq 1\)</span></td>
+</tr>
+<tr class="odd">
+<td>Debiased machine learning (DML) <span class="citation" data-cites="DML">(<a href="#ref-DML" role="doc-biblioref">Chernozhukov et al. 2018</a>)</span></td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<section id="recoverability-via-ipw" class="level3">
+<h3 class="anchored" data-anchor-id="recoverability-via-ipw">Recoverability via IPW</h3>
+<p>Graphical conditions for recoverability via IPW <span class="citation" data-cites="Mohan2014">(<a href="#ref-Mohan2014" role="doc-biblioref">Mohan and Pearl 2014</a>)</span>, with missing data on <span class="math inline">\(Y\)</span>, are:</p>
+<ol type="1">
+<li>There is a back-door admissible set in the substantive model (<span class="math inline">\(H\)</span>)</li>
+<li>No self-selection: there are no directed arrows between <span class="math inline">\(Y\)</span> and <span class="math inline">\(R_Y\)</span></li>
+<li>No open collider paths between <span class="math inline">\(Y\)</span> and <span class="math inline">\(R_Y\)</span> (open by variables involved in the query)</li>
+<li>(When there are multiple missingness mechanisms: <span class="math inline">\(R_V\cap R_{\text{mb}(R_V)}=\emptyset\)</span>)</li>
+</ol>
+<p>Our <span class="math inline">\(m\)</span>-graph <span class="math inline">\(\mathcal{G}\)</span> (figure 1) allows recoverability, so we can express :</p>
+<p><span id="eq-4"><span class="math display">\[
+\begin{aligned}
+    p(Y\mid do(A)) &amp;= \int\frac{ \text{d} H}{p(A\mid H)}\int \frac{\text{d} M}{\mathbb{P}(R_Y=1\mid H,M)}\, p(H,A,M,Y\mid R_Y=1)  \\
+    &amp;= \mathbb{E}_{H\mid R_Y=1}\left[\frac{p(A,Y\mid H,M,R_Y=1)}{p(A\mid H)\, \mathbb{P}(R_Y=1\mid H,M) }  \right]
+\end{aligned}
+\tag{4}\]</span></span></p>
+<p>Thus, the IPW-estimator of the ATE is:</p>
+<p><span id="eq-5"><span class="math display">\[
+    \hat{\psi}^{w} = N_1^{-1}\sum_{i=1}^{N_1}\frac{(2A^i-1)\,Y^i}{\hat{p}(A^i\mid H^i)\,\hat{\mathbb{P}}(R_Y=1\mid H^i,M^i) }
+\tag{5}\]</span></span></p>
+<p>It requires two models:</p>
+<ul>
+<li>Treatment-assignment mechanism: <span class="math inline">\(\hat{p}(A^i\mid H^i)\)</span>. It <strong>does not</strong> involve the mediator <span class="math inline">\(M\)</span></li>
+<li>Selection mechanism: <span class="math inline">\(\hat{\mathbb{P}}(R_Y=1\mid H^i,M^i)\)</span>. It <strong>does</strong> involve the mediator <span class="math inline">\(M\)</span></li>
+</ul>
+</section>
+<section id="recoverability-via-regression-adjustment" class="level3">
+<h3 class="anchored" data-anchor-id="recoverability-via-regression-adjustment">Recoverability via regression adjustment</h3>
+<p>Working with samples from <span class="math inline">\(P(H,A,M,Y^*,R_Y)\)</span> implies conditioning on <span class="math inline">\(R_Y=1\)</span> <span class="citation" data-cites="Bareinboim12">(<a href="#ref-Bareinboim12" role="doc-biblioref">Bareinboim and Pearl 2012</a>)</span>. In the <span class="math inline">\(m\)</span>-graph of figure 1, <span class="math inline">\(\mathcal{G}\)</span>, such condition opens the following non-causal paths in the (proper) back-door graph:</p>
+<ul>
+<li><span class="math inline">\(A\longrightarrow R_Y\longleftarrow H\longrightarrow Y\)</span></li>
+<li><span class="math inline">\(A\longrightarrow R_Y\longleftarrow H\longrightarrow M\longrightarrow Y\)</span></li>
+<li><span class="math inline">\(A\longrightarrow R_Y\longleftarrow M\longrightarrow Y\)</span></li>
+<li><span class="math inline">\(A\longrightarrow R_Y\longleftarrow M\longleftarrow H\longrightarrow Y\)</span></li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="mdag3.png" class="img-fluid figure-img" width="250"></p>
+<figcaption>Figure 3: The (proper) back-door graph</figcaption>
+</figure>
+</div>
+<p>Graphical conditions for recoverability via GAC <span class="citation" data-cites="Correa_Tian_Bareinboim_2018">(<a href="#ref-Correa_Tian_Bareinboim_2018" role="doc-biblioref">J. Correa, Tian, and Bareinboim 2018</a>)</span>, with missing data on <span class="math inline">\(Y\)</span>, using an adjustment set <span class="math inline">\(Z\)</span>:</p>
+<ol type="1">
+<li>All non-causal paths between <span class="math inline">\(A\)</span> and <span class="math inline">\(Y\)</span> are blocked by <span class="math inline">\(Z\)</span> and <span class="math inline">\(R_Y\)</span>: <span class="math inline">\(Y\perp A\mid Z, R_Y\)</span> in the (proper) back-door graph</li>
+<li><span class="math inline">\(Z\)</span> <span class="math inline">\(d\)</span>-separates <span class="math inline">\(Y\)</span> from <span class="math inline">\(R_Y\)</span>: <span class="math inline">\(Y\perp R_Y\mid Z\)</span> in the (proper) back-door graph</li>
+<li><span style="color:blue;">The adjustment set contains no forbidden nodes</span>: <span class="math inline">\(Z\cap\text{fb}(A,Y;\mathcal{G})=\emptyset\)</span></li>
+</ol>
+<blockquote class="blockquote">
+<p>No adjustment set fulfills all these critera. In particular, <span class="math inline">\(Z=\{H,M\}\)</span> fulfills only the first two.</p>
+</blockquote>
+<p>These criteria are incomplete, because they do not consider post-treatment selection influenced by mediators.</p>
+<p><strong>Fix</strong>: <em>Our</em> recoverability criteria via regression adjustment with missing data on <span class="math inline">\(Y\)</span> using pre-treatment set <span class="math inline">\(H\)</span> and forbidden set <span class="math inline">\(M\subset \text{fb}(A,Y;\mathcal{G})\)</span>:</p>
+<ol type="1">
+<li>All non-causal paths between <span class="math inline">\(A\)</span> and <span class="math inline">\(Y\)</span> are blocked by <span class="math inline">\(H\)</span>: <span class="math inline">\(Y\perp A\mid H\)</span> in the (proper) back-door graph <span style="color:blue;">of the substantive model</span></li>
+<li><span class="math inline">\(H,M\)</span> <span class="math inline">\(d\)</span>-separate <span class="math inline">\(Y\)</span> from <span class="math inline">\(R_Y\)</span>: <span class="math inline">\(Y\perp R_Y\mid H,M\)</span> in the (proper) back-door graph</li>
+<li><span style="color:blue;">The adjustment set contains no forbidden nodes</span>: <span class="math inline">\(H\cap\text{fb}(A,Y;\mathcal{G})=\emptyset\)</span></li>
+</ol>
+<blockquote class="blockquote">
+<p>This modification is not a revolutionary discovery. It is implied from the sequential factorization by <span class="citation" data-cites="Mohan2014">Mohan and Pearl (<a href="#ref-Mohan2014" role="doc-biblioref">2014</a>)</span>, and from <span class="math inline">\(c\)</span>-factorization by <span class="citation" data-cites="Correa_Tian_Bareinboim_2019">J. D. Correa, Tian, and Bareinboim (<a href="#ref-Correa_Tian_Bareinboim_2019" role="doc-biblioref">2019</a>)</span>. Yet, the former does not address the causal query directly, and the latter might be a fairly complicated overshoot. A nice list of graphical criteria, as in the case without forbidden nodes, might be more useful for researchers. Besides, IPW tends to be the first option in applied research, maybe it is thought that in some contexts regression adjustment is not possible.</p>
+</blockquote>
+<p>Under the modified criteria, we have that:</p>
+<p><span id="eq-6"><span class="math display">\[
+\psi = \Delta_a\mathbb{E}_H\mathbb{E}_{M\mid H,A=a}\mathbb{E}[Y\mid H,A=a, M, R_Y=1]
+\tag{6}\]</span></span></p>
+<p>This estimand can be expressed in two different ways, each using two models.</p>
+<p><span style="color:blue;"><strong>Solution 1: full mediator density-model</strong>:</span></p>
+<p><span id="eq-7"><span class="math display">\[
+\psi = \Delta_a\mathbb{E}_H\left[\int \underbrace{\text{d}P(M\mid H,A=a)}_{\mathcal{M}_2}\, \underbrace{Q(H,a,M)}_{\mathcal{M}_1} \right]
+\tag{7}\]</span></span></p>
+<p>One model for the <strong>expected-outcome model</strong> (with <span class="math inline">\(M\)</span> as predictor): <span class="math inline">\(Q(H,A,M)=\mathbb{E}[Y\mid H,A, M, R_Y=1]\)</span>. The other model involved is a <strong>full mediator density-model</strong>: <span class="math inline">\(p(M\mid H,A)\)</span></p>
+<p><span style="color:blue;"><strong>Solution 2: nested/hierarchical regressions</strong>:</span></p>
+<p><span id="eq-8"><span class="math display">\[
+\begin{aligned}
+&amp;\mathcal{M}_1: &amp; Q_1(H,A,M) &amp;=\mathbb{E}[Y\mid H,A, M, R_Y=1] \\
+&amp;\mathcal{M}_2: &amp; Q_2(H,A) &amp;=\mathbb{E}_{M\mid H,A}\, Q_1(H,A,M) \\
+&amp; &amp; \psi &amp;= \Delta_a\mathbb{E}_H\, Q_2(H,a)
+\end{aligned}
+\tag{8}\]</span></span></p>
+<p>The second model is not in the mediator support, but in the outcome support. <span class="math inline">\(\mathcal{M}_2\)</span> <em>averages the predictions of</em> <span class="math inline">\(\mathcal{M}_1\)</span>, as a function of only <span class="math inline">\(H,A\)</span>.</p>
+<p>This solution has a clear advantage: it does not require modeling the conditional density of <span class="math inline">\(M\)</span>, which is a hard job when such a variable is high-dimensional or combines discrete and continuous components. A little of math is required in the TMLE front.</p>
+</section>
+<section id="recoverability-via-mediation-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="recoverability-via-mediation-analysis">Recoverability via mediation analysis</h3>
+<p>An alternative approach, closely related to regression adjustment, is mediation analysis. This is a viable approach in some circumstances, as the <em>natural indirect effect</em> (NIE) and the <em>total direct effect</em> (TDE) might be recoverable using Correa’s GAC, even when the ATE is not. The latter can be <em>reconstructed</em> as ATE = NIE + TDE. Yet, this approach has drawbacks relative to regression adjustment:</p>
+<ul>
+<li><p>Identifiability conditions in the substantive model are stronger for mediation effects than for the ATE: sequential ignorability (and cross-world assumption). Not clear to me how violations impact recoverability.</p></li>
+<li><p>TMLE for mediation effects become a bit more involved</p></li>
+<li><p>An explicit model for <span class="math inline">\(M\)</span> is required, but reformulations similar to <strong>solution 2</strong> are possible <span class="citation" data-cites="deepmed">(<a href="#ref-deepmed" role="doc-biblioref">Xu, Liu, and Liu 2022</a>)</span></p></li>
+</ul>
+</section>
+<section id="multiply-robustness" class="level3">
+<h3 class="anchored" data-anchor-id="multiply-robustness">Multiply-robustness</h3>
+<p>Combining IPW and regression adjustment solutions produces <strong>multiply-robustness</strong>. A <strong>doubly-robust</strong> estimator for the ATE can be constructed for <strong>solution 1</strong>: it will be consistent if all semiparametric models involved are correctly specified, or in one of these scenarios:</p>
+<ul>
+<li><span class="math inline">\(p(M\mid H, A),\quad\)</span> <span class="math inline">\(\mathbb{E}[Y\mid H,A, M, R_Y=1]\quad\)</span> are both well specified</li>
+<li><span class="math inline">\(p(A\mid H)\)</span> and <span class="math inline">\(p(R_Y\mid A,H,M)\)</span> are both well specified</li>
+</ul>
+<p>Nested regressions (<strong>solution 2</strong>) would produce <strong>doubly-robustness</strong> too, with consistency if either:</p>
+<ul>
+<li><span class="math inline">\(Q_2(H,A)=\mathbb{E}_{M\mid H,A=a}\mathbb{E}[Y\mid H,A=a, M, R_Y=1]\)</span> is well specified</li>
+<li><span class="math inline">\(p(A\mid H)\)</span> and <span class="math inline">\(p(R_Y\mid A,H,M)\)</span> are both well specified</li>
+</ul>
+<p>Mediation analysis would produce <strong>triply-robustness</strong>, with consistency if all semiparametric models involved are correctly specified, or in one of these scenarios:</p>
+<ul>
+<li><span class="math inline">\(p(M\mid H, A),\quad\)</span> <span class="math inline">\(\mathbb{E}[Y\mid H,A, M, R_Y=1]\quad\)</span> are all well specified</li>
+<li><span class="math inline">\(p(A\mid H),\quad\)</span> <span class="math inline">\(p(R_Y\mid A,H,M),\quad\)</span> <span class="math inline">\(p(M\mid H, A)\quad\)</span> are all well specified</li>
+<li><span class="math inline">\(p(A\mid H),\quad\)</span> <span class="math inline">\(p(R_Y\mid A,H,M),\quad\)</span> <span class="math inline">\(\mathbb{E}[Y\mid H,A, M, R_Y=1]\quad\)</span> are all well specified</li>
+</ul>
+<p>Note that, using a misspecified model for <span class="math inline">\(M\)</span> here (like when reducing its dimension with PCA, VAE or representation learning) leaves the estimator with <span style="color:blue;">worse</span> robustness than simply using IPW, as it requires correct specification of <span class="math inline">\(A\)</span>, <span class="math inline">\(R_Y\)</span> and <span class="math inline">\(Y\)</span>, whereas IPW only requires <span class="math inline">\(A\)</span>, <span class="math inline">\(R_Y\)</span></p>
+</section>
+</section>
+<section id="path-forward" class="level2">
+<h2 class="anchored" data-anchor-id="path-forward">Path forward</h2>
+<p>Let us commit to:</p>
+<ol type="1">
+<li>One missing mechanism: <span class="math inline">\(R_Y\)</span></li>
+<li><span class="math inline">\(m\)</span>-graph depicted in figure 1, so we have identifiability in the substantive model, and recoverability via IPW and regression</li>
+<li>TMLE (the super-learner is default, we could restrict to only splines or BART, Bayesian?)</li>
+</ol>
+<ul>
+<li>The <code>tmle</code> package in <code>R</code> deals with missing data in a very basic manner, combining dropping observations and single median-imputations: <a href="https://tlverse.org/tmle3/reference/process_missing.html">preprocessing missing data for TMLE</a></li>
+</ul>
+<ol start="4" type="1">
+<li>Nested regressions, and full <span class="math inline">\(M\)</span>-model only for one mediator</li>
+<li>Try simulations</li>
+</ol>
+
+
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-Bareinboim12" class="csl-entry" role="listitem">
+Bareinboim, Elias, and Judea Pearl. 2012. <span>“Controlling Selection Bias in Causal Inference.”</span> In <em>Proceedings of the Fifteenth International Conference on Artificial Intelligence and Statistics</em>, edited by Neil D. Lawrence and Mark Girolami, 22:100–108. Proceedings of Machine Learning Research. La Palma, Canary Islands: PMLR. <a href="https://proceedings.mlr.press/v22/bareinboim12.html">https://proceedings.mlr.press/v22/bareinboim12.html</a>.
+</div>
+<div id="ref-Bareinboim_Tian_Pearl_2014" class="csl-entry" role="listitem">
+Bareinboim, Elias, Jin Tian, and Judea Pearl. 2014. <span>“Recovering from Selection Bias in Causal and Statistical Inference.”</span> <em>Proceedings of the AAAI Conference on Artificial Intelligence</em> 28 (1). <a href="https://doi.org/10.1609/aaai.v28i1.9074">https://doi.org/10.1609/aaai.v28i1.9074</a>.
+</div>
+<div id="ref-Bhattacharya2020" class="csl-entry" role="listitem">
+Bhattacharya, Rohit, Razieh Nabi, Ilya Shpitser, and James M. Robins. 2020. <span>“Identification in Missing Data Models Represented by Directed Acyclic Graphs.”</span> In <em>Proceedings of the 35th Uncertainty in Artificial Intelligence Conference</em>, edited by Ryan P. Adams and Vibhav Gogate, 115:1149–58. Proceedings of Machine Learning Research. PMLR. <a href="https://proceedings.mlr.press/v115/bhattacharya20b.html">https://proceedings.mlr.press/v115/bhattacharya20b.html</a>.
+</div>
+<div id="ref-DML" class="csl-entry" role="listitem">
+Chernozhukov, Victor, Denis Chetverikov, Mert Demirer, Esther Duflo, Christian Hansen, Whitney Newey, and James Robins. 2018. <span>“<span class="nocase">Double/debiased machine learning for treatment and structural parameters</span>.”</span> <em>The Econometrics Journal</em> 21 (1): C1–68. <a href="https://doi.org/10.1111/ectj.12097">https://doi.org/10.1111/ectj.12097</a>.
+</div>
+<div id="ref-Correa_Tian_Bareinboim_2019" class="csl-entry" role="listitem">
+Correa, Juan D., Jin Tian, and Elias Bareinboim. 2019. <span>“Identification of Causal Effects in the Presence of Selection Bias.”</span> <em>Proceedings of the AAAI Conference on Artificial Intelligence</em> 33 (01): 2744–51. <a href="https://doi.org/10.1609/aaai.v33i01.33012744">https://doi.org/10.1609/aaai.v33i01.33012744</a>.
+</div>
+<div id="ref-Correa_Tian_Bareinboim_2018" class="csl-entry" role="listitem">
+Correa, Juan, Jin Tian, and Elias Bareinboim. 2018. <span>“Generalized Adjustment Under Confounding and Selection Biases.”</span> <em>Proceedings of the AAAI Conference on Artificial Intelligence</em> 32 (1). <a href="https://doi.org/10.1609/aaai.v32i1.12125">https://doi.org/10.1609/aaai.v32i1.12125</a>.
+</div>
+<div id="ref-DEMP1977" class="csl-entry" role="listitem">
+Dempster, A. P., N. M. Laird, and D. B. Rubin. 1977. <span>“Maximum Likelihood from Incomplete Data via the <span>EM</span> Algorithm.”</span> <em>Journal of the Royal Statistical Society: Series B</em> 39: 1–38. <a href="http://web.mit.edu/6.435/www/Dempster77.pdf">http://web.mit.edu/6.435/www/Dempster77.pdf</a>.
+</div>
+<div id="ref-EMMI" class="csl-entry" role="listitem">
+Dong, Yiran, and Chao-Ying Joanne Peng. 2013. <span>“Principled Missing Data Methods for Researchers.”</span> <em>SpringerPlus</em> 2: 1–17.
+</div>
+<div id="ref-hernan2004structural" class="csl-entry" role="listitem">
+Hernán, Miguel A., Sonia Hernández-Díaz, and James M. Robins. 2004. <span>“A Structural Approach to Selection Bias.”</span> <em>Epidemiology (Cambridge, Mass.)</em> 15 (5): 615–25. <a href="https://doi.org/10.1097/01.ede.0000135174.63482.43">https://doi.org/10.1097/01.ede.0000135174.63482.43</a>.
+</div>
+<div id="ref-lewin2018attrition" class="csl-entry" role="listitem">
+Lewin, A., R. Brondeel, T. Benmarhnia, F. Thomas, and B. Chaix. 2018. <span>“Attrition Bias Related to Missing Outcome Data: A Longitudinal Simulation Study.”</span> <em>Epidemiology</em> 29 (1): 87–95. <a href="https://doi.org/10.1097/EDE.0000000000000755">https://doi.org/10.1097/EDE.0000000000000755</a>.
+</div>
+<div id="ref-Mohan2014" class="csl-entry" role="listitem">
+Mohan, Karthika, and Judea Pearl. 2014. <span>“Graphical Models for Recovering Probabilistic and Causal Queries from Missing Data.”</span> In <em>Advances in Neural Information Processing Systems</em>, edited by Z. Ghahramani, M. Welling, C. Cortes, N. Lawrence, and K. Q. Weinberger. Vol. 27. Curran Associates, Inc. <a href="https://proceedings.neurips.cc/paper_files/paper/2014/file/31839b036f63806cba3f47b93af8ccb5-Paper.pdf">https://proceedings.neurips.cc/paper_files/paper/2014/file/31839b036f63806cba3f47b93af8ccb5-Paper.pdf</a>.
+</div>
+<div id="ref-mgraphs" class="csl-entry" role="listitem">
+———. 2021. <span>“Graphical Models for Processing Missing Data.”</span> <em>Journal of the American Statistical Association</em> 116 (534): 1023–37. <a href="https://doi.org/10.1080/01621459.2021.1874961">https://doi.org/10.1080/01621459.2021.1874961</a>.
+</div>
+<div id="ref-Pearl1995" class="csl-entry" role="listitem">
+Pearl, Judea. 1995. <span>“Causal Diagrams for Empirical Research.”</span> <em>Biometrika</em> 82 (4): 669–88. <a href="http://www.jstor.org/stable/2337329">http://www.jstor.org/stable/2337329</a>.
+</div>
+<div id="ref-PearlDo" class="csl-entry" role="listitem">
+———. 2012. <span>“The Do-Calculus Revisited.”</span> In <em>Proceedings of the Twenty-Eighth Conference on Uncertainty in Artificial Intelligence</em>, 3–11. UAI’12. Arlington, Virginia, USA: AUAI Press.
+</div>
+<div id="ref-MIPW" class="csl-entry" role="listitem">
+Perkins, Neil J, Stephen R Cole, Ofer Harel, Eric J Tchetgen Tchetgen, BaoLuo Sun, Emily M Mitchell, and Enrique F Schisterman. 2017. <span>“<span class="nocase">Principled Approaches to Missing Data in Epidemiologic Studies</span>.”</span> <em>American Journal of Epidemiology</em> 187 (3): 568–75. <a href="https://doi.org/10.1093/aje/kwx348">https://doi.org/10.1093/aje/kwx348</a>.
+</div>
+<div id="ref-robins1986gcomp" class="csl-entry" role="listitem">
+Robins, James. 1986. <span>“A New Approach to Causal Inference in Mortality Studies with a Sustained Exposure Period—Application to Control of the Healthy Worker Survivor Effect.”</span> <em>Mathematical Modelling</em> 7 (9-12): 1393–1512.
+</div>
+<div id="ref-robins1992recovery" class="csl-entry" role="listitem">
+Robins, James, and Andrea Rotnitzky. 1992. <span>“Recovery of Information and Adjustment for Dependent Censoring Using Surrogate Markers, Aids Epidemiology, Methodological Issues.”</span> <em>Proceedings of the American Statistical Association. Boston: Birkhauser</em>, 24–33.
+</div>
+<div id="ref-Robins1994" class="csl-entry" role="listitem">
+Robins, James, Andrea Rotnitzky, and Lue Zhao. 1994. <span>“Estimation of Regression Coefficients When Some Regressors Are Not Always Observed.”</span> <em>Journal of the American Statistical Association</em> 89 (427): 846–66.
+</div>
+<div id="ref-Rubin1976" class="csl-entry" role="listitem">
+Rubin, Donald B. 1976. <span>“Inference and Missing Data.”</span> <em>Biometrika</em> 63 (3): 581–92.
+</div>
+<div id="ref-RubinMIpaper" class="csl-entry" role="listitem">
+———. 1978. <span>“Multiple Imputations in Sample Surveys: A Phenomenological <span>B</span>ayesian Approach to Nonresponse.”</span> <em>Journal of the American Statistical Association</em> 73 (362): 384–95.
+</div>
+<div id="ref-seaman2013review" class="csl-entry" role="listitem">
+Seaman, Shaun R, and Ian R White. 2013. <span>“Review of Inverse Probability Weighting for Dealing with Missing Data.”</span> <em>Statistical Methods in Medical Research</em> 22 (3): 278–95.
+</div>
+<div id="ref-TMLEbook1" class="csl-entry" role="listitem">
+van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference for Observational and Experimental Data</em>. Springer Series in Statistics. Springer New York. <a href="https://books.google.no/books?id=RGnSX5aCAgQC">https://books.google.no/books?id=RGnSX5aCAgQC</a>.
+</div>
+<div id="ref-deepmed" class="csl-entry" role="listitem">
+Xu, Siqi, Lin Liu, and Zhonghua Liu. 2022. <span>“DeepMed: Semiparametric Causal Mediation Analysis with Debiased Deep Learning.”</span> <em>Advances in Neural Information Processing Systems</em> 35: 28238–51.
+</div>
+</div></section><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p><span class="math inline">\(m\)</span>-graphs generalize causal graphs in settings with sample selection <span class="citation" data-cites="hernan2004structural">(<a href="#ref-hernan2004structural" role="doc-biblioref">Hernán, Hernández-Díaz, and Robins 2004</a>)</span> and missing data <span class="citation" data-cites="mgraphs">(<a href="#ref-mgraphs" role="doc-biblioref">Mohan and Pearl 2021</a>)</span>.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>The back-door graph <span class="math inline">\(\mathcal{G}'[A\!-\!Y]\)</span> is the graph resulting from removing in <span class="math inline">\(\mathcal{G}'\)</span> the first arrow of all directed paths from <span class="math inline">\(A\)</span> to <span class="math inline">\(Y\)</span>. It is termed the <em>proper back-door graph</em> in multi-exposure settings, and results from removing the first arrow of all directed and <em>non-self-intersecting</em> paths from <span class="math inline">\(A\)</span> to <span class="math inline">\(Y\)</span>.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>Sampling from <span class="math inline">\(P(H,A,M,Y^*,R_Y)\)</span> is equivalent to sample from <span class="math inline">\(\{P(H,A,M,Y\mid R_Y=1),P(H,A,M)\}\)</span><a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>Recoverability might be possible without identifiability in the substantive model, via (fairly complicated) <span class="math inline">\(c\)</span>-factorizations <span class="citation" data-cites="Correa_Tian_Bareinboim_2019">(<a href="#ref-Correa_Tian_Bareinboim_2019" role="doc-biblioref">J. D. Correa, Tian, and Bareinboim 2019</a>)</span> or <span class="math inline">\(\phi\)</span>-factorizations <span class="citation" data-cites="Bhattacharya2020">(<a href="#ref-Bhattacharya2020" role="doc-biblioref">Bhattacharya et al. 2020</a>)</span> related to the problem of <span class="math inline">\(g\)</span>-<em>identifiability</em><a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn5"><p>Literature review based on <span class="citation" data-cites="seaman2013review">Seaman and White (<a href="#ref-seaman2013review" role="doc-biblioref">2013</a>)</span>, <span class="citation" data-cites="EMMI">Dong and Peng (<a href="#ref-EMMI" role="doc-biblioref">2013</a>)</span>, <span class="citation" data-cites="MIPW">Perkins et al. (<a href="#ref-MIPW" role="doc-biblioref">2017</a>)</span>, <span class="citation" data-cites="lewin2018attrition">Lewin et al. (<a href="#ref-lewin2018attrition" role="doc-biblioref">2018</a>)</span><a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

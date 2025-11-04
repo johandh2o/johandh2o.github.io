@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2023-09-15">
+<meta name="description" content="A set of ideas on how to leverage structure learning and graph uncertainty quantification for downstream causal inference with missing data mechanisms in the outcome variable">
+
+<title>Structure learning for downstream causal inference with missing outcome data – Johan de Aguas</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-9e6471fc7838a385aca4b39307383b6d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Johan de Aguas</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../research.html"> 
+<span class="menu-text">Research</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#structural-causal-models" id="toc-structural-causal-models" class="nav-link active" data-scroll-target="#structural-causal-models">Structural causal models</a></li>
+  <li><a href="#structure-uncertainty-and-causal-inference" id="toc-structure-uncertainty-and-causal-inference" class="nav-link" data-scroll-target="#structure-uncertainty-and-causal-inference">Structure uncertainty and causal inference</a></li>
+  <li><a href="#post-treatment-selection-induced-by-missing-outcome-data-justification-for-structure-learning" id="toc-post-treatment-selection-induced-by-missing-outcome-data-justification-for-structure-learning" class="nav-link" data-scroll-target="#post-treatment-selection-induced-by-missing-outcome-data-justification-for-structure-learning">Post-treatment selection induced by missing outcome data: justification for structure learning</a></li>
+  <li><a href="#constrained-structure-learning" id="toc-constrained-structure-learning" class="nav-link" data-scroll-target="#constrained-structure-learning">Constrained structure learning</a></li>
+  <li><a href="#representation-of-bipartite-graphs-and-dags" id="toc-representation-of-bipartite-graphs-and-dags" class="nav-link" data-scroll-target="#representation-of-bipartite-graphs-and-dags">Representation of bipartite graphs and DAGs</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Structure learning for downstream causal inference with missing outcome data</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Bayesian</div>
+    <div class="quarto-category">MCMC</div>
+    <div class="quarto-category">VI</div>
+    <div class="quarto-category">causal inference</div>
+    <div class="quarto-category">graphical models</div>
+    <div class="quarto-category">structure learning</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    A set of ideas on how to leverage structure learning and graph uncertainty quantification for downstream causal inference with missing data mechanisms in the outcome variable
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">September 15, 2023</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<hr>
+<section id="structural-causal-models" class="level2">
+<h2 class="anchored" data-anchor-id="structural-causal-models">Structural causal models</h2>
+<p>The most complete and versatile axiomatic treatment of causal inference is given by the <em>structural causal model</em> (SCM) framework, developed by celebrated computer scientist and philosopher Dr.&nbsp;Judea Pearl <span class="citation" data-cites="PearlCausality">(<a href="#ref-PearlCausality" role="doc-biblioref">Pearl 2009</a>)</span>. A brief introduction of SCM is given in a <a href="https://johandh2o.github.io/blog/posts/2023-09-01_UQcausality/">previous blog post</a>.</p>
+</section>
+<section id="structure-uncertainty-and-causal-inference" class="level2">
+<h2 class="anchored" data-anchor-id="structure-uncertainty-and-causal-inference">Structure uncertainty and causal inference</h2>
+<p>Consider the case of a data-generating process (DGP) consisting of a set of pre-treatment variables <span class="math inline">\(\mathcal{W}\)</span>, a binary exposure <span class="math inline">\(A\)</span>, and a continuous outcome <span class="math inline">\(Y\)</span>. We are interested in estimating the <em>average treatment effect</em> (ATE), given by:</p>
+<p><span class="math display">\[
+    \psi = \Delta_a \mathbb{E}\left[Y\mid do(A=a) \right]
+\]</span> To estimate such a parameter from observational data on <span class="math inline">\(\mathcal{V}=\{\mathcal{W},A,Y\}\)</span>, <strong>identification</strong> must be established beforehand. A causal estimand is <em>nonparametrically</em> identified from the joint distribution <span class="math inline">\(P(\mathcal{V})\)</span> if it can uniquely computed as a functional of it. In other words, <span class="math inline">\(Q\)</span> is identified if there exists a <strong>functional/algorithm</strong> <span class="math inline">\(\Psi_\mathcal{G}:P(\mathcal{V})\mapsto Q\)</span>, such that such that it returns a unique value up to some equivalent relation.</p>
+<p>Under the graphical assumption of <em>back-door admissibility</em> of <span class="math inline">\(\mathcal{W}\)</span> in <span class="math inline">\(\mathcal{G}\)</span> (meaning that <span class="math inline">\(\mathcal{W}\)</span> blocks <strong>all paths</strong> between <span class="math inline">\(A\)</span> and <span class="math inline">\(Y\)</span> that start with an arrow pointing to <span class="math inline">\(A\)</span>) we get <em>conditional ignorability</em> and thus identification of <span class="math inline">\(\psi\)</span>, which now can be expressed as:</p>
+<p><span class="math display">\[
+    \psi = \Psi_\mathcal{G}[P(\mathcal{V})] = \mathbb{E}_\mathcal{W}\Delta_a \mathbb{E}\left[Y\mid\mathcal{W},A=a \right]
+\]</span></p>
+<p>Such a graphical assumption validates other identification functionals, such as those given by <em>inverse probability weighting</em> (IPW) and doubly-robust approaches (AIPW, TMLE, DML). With finite samples, and a consistent estimator for the inner regression, a valid estimator is:</p>
+<p><span class="math display">\[
+    \hat{\psi} = N^{-1}\sum_{i=1}^N\Delta_a \hat{\mathbb{E}}\left[Y\mid\mathcal{W}^i,A=a \right]
+\]</span></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Under ignorability, the structure <span class="math inline">\(\mathcal{G}\)</span> is not required, i.e., if <span class="math inline">\(\mathcal{G}\)</span> is unknown, <span class="math inline">\(\hat{\psi}\)</span> can still be constructed and will be consistent. The set <span class="math inline">\(\mathcal{W}\)</span> might contain variables that are not confounders, and other unimportant variables, so <span class="math inline">\(\hat{\psi}\)</span> might be statistically inefficient. Removing apparent unimportant variables from <span class="math inline">\(\mathcal{W}\)</span> might increase precision, but would potentially introduce confounding bias, if the eliminated variable is a weak confounding. <strong>Causal inferece is a bias-conservative endeavor, so we are more willing to sacrifice precision instead of introducing confounding bias</strong>.</p>
+</div>
+</div>
+</section>
+<section id="post-treatment-selection-induced-by-missing-outcome-data-justification-for-structure-learning" class="level2">
+<h2 class="anchored" data-anchor-id="post-treatment-selection-induced-by-missing-outcome-data-justification-for-structure-learning">Post-treatment selection induced by missing outcome data: justification for structure learning</h2>
+<p>Now consider the inclusion of a set of post-treatment (pre-outcome) variables <span class="math inline">\(\mathcal{Z}_0\)</span> in the data. Besides, there is a unknown missingness mechanisms <span class="math inline">\(R_Y\)</span> at play that dictates which observations of <span class="math inline">\(Y\)</span> are selected (<span class="math inline">\(R_Y=1\)</span>) and which are missing (<span class="math inline">\(R_Y=0\)</span>). In this setting, the ATE is identified under the following graphical criteria:</p>
+<ul>
+<li>All non-causal paths between <span class="math inline">\(A\)</span> and <span class="math inline">\(Y\)</span> are blocked by <span class="math inline">\(\mathcal{W}\)</span> in the substantive model: <span class="math inline">\(Y\perp A\mid \mathcal{W}\)</span> in <span class="math inline">\((\mathcal{G}\ominus R_Y)[A\!-\!Y]\)</span></li>
+<li><span class="math inline">\(\mathcal{W}\cup\mathcal{Z}\)</span> <span class="math inline">\(d\)</span>-separates <span class="math inline">\(Y\)</span> from <span class="math inline">\(R_Y\)</span> in the proper back-door graph: <span class="math inline">\(Y\perp R_Y\mid \mathcal{W},\mathcal{Z}\)</span> in <span class="math inline">\(\mathcal{G}[A\!-\!Y]\)</span></li>
+</ul>
+<p>Then, the ATE and its regression estimator, can be expressed as:</p>
+<p><span id="eq-1"><span class="math display">\[\begin{aligned}
+\psi_1 &amp;= \mathbb{E}_\mathcal{W}\,\Delta_a\mathbb{E}_{\mathcal{Z}\mid \mathcal{W},A=a}\, \mathbb{E}[Y\mid \mathcal{W},\mathcal{Z},A=a,R_Y=1]\\
+\hat{\psi}_1 &amp;=  N^{-1}\sum_{i=1}^N\Delta_a\hat{\mathbb{E}}_{\mathcal{Z}\mid \mathcal{W},A=a}\, \hat{\mathbb{E}}[Y\mid \mathcal{W}^i,\mathcal{Z}^i,A=a,R_Y=1]
+\end{aligned}
+\tag{1}\]</span></span></p>
+<p>However, “weaker” graphical conditions can also lead to identification. For instance, if there exist <span class="math inline">\(W\subseteq\mathcal{W}\)</span> and <span class="math inline">\(Z_0,Z_1\subseteq\mathcal{Z}\)</span>, such that:</p>
+<ul>
+<li><span class="math inline">\(W\cup Z_0\cup Z_1\)</span> <span class="math inline">\(d\)</span>-separates <span class="math inline">\(Y\)</span> from <span class="math inline">\(R_Y\)</span> in the proper back-door graph: <span class="math inline">\(Y\perp R_Y\mid W,Z_1,Z_2\)</span> in <span class="math inline">\(\mathcal{G}[A\!-\!Y]\)</span></li>
+<li>All non-causal paths between <span class="math inline">\(A\)</span> and <span class="math inline">\(Y\)</span> are blocked by <span class="math inline">\(W\)</span> in the substantive model: <span class="math inline">\(Y\perp A\mid W\)</span> in <span class="math inline">\((\mathcal{G}\ominus R_Y)[A\!-\!Y]\)</span></li>
+<li><span class="math inline">\(Z_0\)</span> does not contain forbidden nodes (mediators or their descendants) (nor descendants of A) and <span class="math inline">\(Z_1\)</span> contains only forbidden nodes</li>
+</ul>
+<p>Then, the ATE and its regression estimator can be expressed as:</p>
+<p><span id="eq-2"><span class="math display">\[\begin{aligned}
+\psi_2 &amp;= \mathbb{E}_{W,Z_0}\,\Delta_a\mathbb{E}_{Z_1\mid W,Z_0,A=a}\, \mathbb{E}[Y\mid W,Z_0,Z_1,A=a,R_Y=1]\\
+\hat{\psi}_2 &amp;=  N^{-1}\sum_{i=1}^N\Delta_a\hat{\mathbb{E}}_{Z_1\mid W,Z_0,A=a}\, \hat{\mathbb{E}}[Y\mid W^i,Z_0^i,Z_1^i,A=a,R_Y=1]
+\end{aligned}
+\tag{2}\]</span></span></p>
+<p>Moreover, if in the true graph <span class="math inline">\(\mathcal{G}\)</span> the first condition is met with only <span class="math inline">\(W\cup Z_0\)</span> (<span class="math inline">\(Z_1\)</span> not required), the final estimator requires <strong>only one</strong> regression model:</p>
+<p><span id="eq-3"><span class="math display">\[\begin{aligned}
+\psi_3 &amp;= \mathbb{E}_{W,Z_0}\,\Delta_a \mathbb{E}[Y\mid W,Z_0,A=a,R_Y=1]\\
+\hat{\psi}_3 &amp;=  N^{-1}\sum_{i=1}^N\Delta_a\hat{\mathbb{E}}[Y\mid W^i,Z_0^i,A=a,R_Y=1]
+\end{aligned}
+\tag{3}\]</span></span></p>
+<p>It is expected that, in this case, <span class="math inline">\(\hat{\psi}_3\)</span> is is asymptotically more efficient than <span class="math inline">\(\hat{\psi}_1\)</span> and <span class="math inline">\(\hat{\psi}_2\)</span>. An even more efficient estimator can leverage more information fom <span class="math inline">\(\mathcal{G}\)</span>, such as conditioning on the remaining <span class="math inline">\(pa(Y;\mathcal{G})\)</span></p>
+<p><span id="eq-4"><span class="math display">\[
+\hat{\psi}_4 =  N^{-1}\sum_{i=1}^N\Delta_a\hat{\mathbb{E}}[Y\mid W^i,Z_0^i,T^i,A=a,R_Y=1]
+\tag{4}\]</span></span></p>
+<p>Where <span class="math inline">\(T=pa(Y;\mathcal{G})\,\setminus\ de(A;\mathcal{G})\,\setminus (W\cup Z_0\cup A\cup R_Y)\)</span></p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Justification for structure learning">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Justification for structure learning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In conclusion, recovery of the ATE from post-treatment selection induced by missing outcome data requires more information from the causal graph, not only to gain statistical efficiency but to inform modeling decisions, i.e., the number and type of regression models needed, the dimension of fluctuation parameter is targeted learning, and more.</p>
+</div>
+</div>
+</section>
+<section id="constrained-structure-learning" class="level2">
+<h2 class="anchored" data-anchor-id="constrained-structure-learning">Constrained structure learning</h2>
+<p>Bayesian structure learning is a type of Bayesian inverse problem that aims to infer the posterior distribution of <span class="math inline">\(\mathcal{G}\)</span> given data <span class="math inline">\(\boldsymbol{O}\)</span>, i.e., <span class="math inline">\(p(\mathcal{G}\mid\boldsymbol{O})\)</span>. Many MCMC, VI, and particle-based algorithms have been designed for this purpose, each with its sets of assumptions, strengths and weaknesses.</p>
+<p>In our motivated case, structure learning should be constrain to respect the known topological partial order induced by time. This is, future variables cannot influence past variables. This implies adjacency matrix <span class="math inline">\(\mathcal{G}\)</span> can be expressed in block form as:</p>
+<p><span class="math display">\[
+\mathcal{G}=\left(\begin{array}{c|ccccc}  
+   &amp; \mathcal{W} &amp; A &amp; \mathcal{Z} &amp; R_Y &amp; Y\\ \hline  
+   \mathcal{W} &amp; 0 &amp; C_1 &amp; B_1 &amp; B_1 &amp; C_2\\
+   A &amp; 0 &amp; 0 &amp; C_3 &amp; C_3 &amp; C_3\\
+   \mathcal{Z} &amp; 0 &amp; 0 &amp; D &amp; B_2 &amp; B_2\\
+   R_Y &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0\\
+   Y &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0\\
+\end{array}\right)
+\]</span></p>
+<p>Where <span class="math inline">\(B_1,B_2\)</span> are bipartite graphs, <span class="math inline">\(C_1,C_2,C_3\)</span> are bipartite graphs of one node on one side, and <span class="math inline">\(D\)</span> is a DAG.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Within <span class="math inline">\(\mathcal{Z}\)</span> no time- or topological order is known a priori.</p>
+</div>
+</div>
+<p>The problem is now equivalent to infering <span class="math inline">\(p(B_1,B_2,C_1,C_2,C_3,D\mid\boldsymbol{O})\)</span></p>
+</section>
+<section id="representation-of-bipartite-graphs-and-dags" class="level2">
+<h2 class="anchored" data-anchor-id="representation-of-bipartite-graphs-and-dags">Representation of bipartite graphs and DAGs</h2>
+<p>Let <span class="math inline">\(d_w=|\mathcal{W}|\)</span>, <span class="math inline">\(d_z=|\mathcal{Z}|\)</span> and <span class="math inline">\(d=d_w+d_z+3\)</span>. The (adjacency matrix) of DAG <span class="math inline">\(\mathcal{G}\)</span> lives in <span class="math inline">\(\{0,1\}^{d\times d}\)</span>, and it can be represented by <span class="math inline">\(\mathcal{G}=S\odot T\)</span>, where <span class="math inline">\(T\in \{0,1\}^{d\times d}\)</span> dictates the <em>topological order</em>, i.e, <span class="math inline">\(T_{i,j}=1\)</span> if <span class="math inline">\(i\prec j\)</span>; and <span class="math inline">\(S\in \{0,1\}^{d\times d}\)</span> acts as a <em>mask structure</em> to disable the edge existence. <span class="math inline">\(S\)</span> is needed to counter the <em>post hoc ergo propter hoc</em> fallacy: not because <span class="math inline">\(j\)</span> follows <span class="math inline">\(i\)</span>, it is true that <span class="math inline">\(i\)</span> causes <span class="math inline">\(j\)</span>. Any DAG can be represented this way <span class="citation" data-cites="annadani2023bayesdag">(<a href="#ref-annadani2023bayesdag" role="doc-biblioref">Annadani et al. 2023</a>)</span>.</p>
+<p><span class="citation" data-cites="annadani2023bayesdag">Annadani et al. (<a href="#ref-annadani2023bayesdag" role="doc-biblioref">2023</a>)</span> propose a representation of <span class="math inline">\(T\)</span> in term of node potentials <span class="math inline">\(\rho\in\mathbb{R}^d\)</span>, such that <span class="math inline">\(T_{i,j}=\mathbb{I}(\rho_j-\rho_i&gt;0)\)</span>, and leverages the equivalence <span class="math inline">\(T=\sigma(\rho)\Lambda\sigma(\rho)^\top\)</span>, with <span class="math inline">\(\sigma(\rho)\)</span> being a permutation matrix of <span class="math inline">\(\rho\)</span>, and <span class="math inline">\(\Lambda\)</span> being an upper-triangular matrix filled with ones. Such alternative formulation facilitates the computation of approximate gradients with respect to <span class="math inline">\(\rho\)</span> using techniques from the <em>differentiable permutation</em> literature.</p>
+<p>Parameters of <span class="math inline">\(S_{i,j}\)</span> are updated within the <em>stochastic gradient Markov chain Monte Carlo</em> (SG-MCMC) scheme either via <em>variational inference</em> (as a function of updated <span class="math inline">\(\rho\)</span>) or via own SG-MCMC. The authors point the former performs better, because coupling <span class="math inline">\(S\)</span> with <span class="math inline">\(\rho\)</span> seems to be important. In other words, <strong>the embedding representation of <span class="math inline">\(T\)</span> should also be informative of <span class="math inline">\(S\)</span></strong>.</p>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-annadani2023bayesdag" class="csl-entry" role="listitem">
+Annadani, Yashas, Nick Pawlowski, Joel Jennings, Stefan Bauer, Cheng Zhang, and Wenbo Gong. 2023. <span>“BayesDAG: Gradient-Based Posterior Sampling for Causal Discovery.”</span> <em>arXiv Preprint arXiv:2307.13917</em>.
+</div>
+<div id="ref-PearlCausality" class="csl-entry" role="listitem">
+Pearl, Judea. 2009. <em>Causality: Models, Reasoning, and Inference</em>. 2nd ed. Cambridge, UK: Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511803161">https://doi.org/10.1017/CBO9780511803161</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

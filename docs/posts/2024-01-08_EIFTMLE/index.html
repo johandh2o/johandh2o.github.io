@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2024-01-08">
+<meta name="description" content="TMLE combines ideas from targeted learning and the efficient influence function to provide mutiply-robust and efficient estimation method for causal inference">
+
+<title>A semi-formal presentation of targeted minimum loss estimation (TMLE) – Johan de Aguas</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-9e6471fc7838a385aca4b39307383b6d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script>
+window.MathJax = {
+  loader: {
+    load: ['[tex]/physics']
+  },
+  tex: {
+    packages: {'[+]': ['physics']}
+  }
+};
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Johan de Aguas</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../research.html"> 
+<span class="menu-text">Research</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#what-is-tmle" id="toc-what-is-tmle" class="nav-link active" data-scroll-target="#what-is-tmle">What is TMLE?</a></li>
+  <li><a href="#a-tmle-recipe-for-the-ate-in-an-observational-study" id="toc-a-tmle-recipe-for-the-ate-in-an-observational-study" class="nav-link" data-scroll-target="#a-tmle-recipe-for-the-ate-in-an-observational-study">A TMLE recipe for the ATE in an observational study</a></li>
+  <li><a href="#a-semi-formal-motivation-and-presentation" id="toc-a-semi-formal-motivation-and-presentation" class="nav-link" data-scroll-target="#a-semi-formal-motivation-and-presentation">A semi-formal motivation and presentation</a>
+  <ul class="collapse">
+  <li><a href="#the-influence-function-if" id="toc-the-influence-function-if" class="nav-link" data-scroll-target="#the-influence-function-if">The influence function (IF)</a></li>
+  </ul></li>
+  <li><a href="#back-to-tmle" id="toc-back-to-tmle" class="nav-link" data-scroll-target="#back-to-tmle">Back to TMLE</a>
+  <ul class="collapse">
+  <li><a href="#why-the-eif-is-important-then" id="toc-why-the-eif-is-important-then" class="nav-link" data-scroll-target="#why-the-eif-is-important-then">Why the EIF is important then?</a></li>
+  <li><a href="#where-is-the-loss-function" id="toc-where-is-the-loss-function" class="nav-link" data-scroll-target="#where-is-the-loss-function">Where is the loss function?</a></li>
+  <li><a href="#what-are-actually-the-clever-covariates" id="toc-what-are-actually-the-clever-covariates" class="nav-link" data-scroll-target="#what-are-actually-the-clever-covariates">What are actually the clever covariates?</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">A semi-formal presentation of targeted minimum loss estimation (TMLE)</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">semiparametric</div>
+    <div class="quarto-category">nonparametric</div>
+    <div class="quarto-category">IPW</div>
+    <div class="quarto-category">TMLE</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    TMLE combines ideas from targeted learning and the efficient influence function to provide mutiply-robust and efficient estimation method for causal inference
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">January 8, 2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<hr>
+<section id="what-is-tmle" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-tmle">What is TMLE?</h2>
+<p><em>Targeted minimum loss estimation</em> (TMLE) is a flexible and powerful framework, introduced by <strong>Susan Gruber</strong> and <strong>Mark van der Laan</strong>, for estimating statistical and causal parameters from data. It combines the benefits of multiply-robustness estimation via influence functions with an optimal targeting approach, making it well-suited for causal inference with observational data, where the treatment or outcome models might be misspecified <span class="citation" data-cites="gruber2009targeted">(<a href="#ref-gruber2009targeted" role="doc-biblioref">Gruber and Laan 2009</a>)</span>.</p>
+<p>Let us present the TMLE framework at two levels:</p>
+<ol type="1">
+<li>A methodological recipe for the ATE in an observational study, with no detailed explanations</li>
+<li>A semi-formal motivation and presentation of the efficient influence function (EIF) and the TMLE</li>
+</ol>
+<p>Despite EFI-based and TMLE-based inference having rich and very useful properties for semiparametric causal inference, it’s not until recently they have been adopted more broadly. These methods tend to be perceived as too abstract, too technical or too esoteric for more applied research. Here some resources to start approaching the subject:</p>
+<ul>
+<li><em>Visually communicating and teaching intuition for influence functions</em>, <span class="citation" data-cites="fisher2021visually">Fisher and Kennedy (<a href="#ref-fisher2021visually" role="doc-biblioref">2021</a>)</span></li>
+<li><em>Demystifying statistical learning based on efficient influence functions</em>, <span class="citation" data-cites="hines2022demystifying">Hines et al. (<a href="#ref-hines2022demystifying" role="doc-biblioref">2022</a>)</span></li>
+<li><em>An illustrated guide to TMLE</em>, <span class="citation" data-cites="ilustrated">Hoffman (<a href="#ref-ilustrated" role="doc-biblioref">2020</a>)</span></li>
+<li><em>Targeted maximum likelihood estimation: A gentle introduction</em> (<strong>seminal paper</strong>), <span class="citation" data-cites="gruber2009targeted">Gruber and Laan (<a href="#ref-gruber2009targeted" role="doc-biblioref">2009</a>)</span></li>
+</ul>
+</section>
+<section id="a-tmle-recipe-for-the-ate-in-an-observational-study" class="level2">
+<h2 class="anchored" data-anchor-id="a-tmle-recipe-for-the-ate-in-an-observational-study">A TMLE recipe for the ATE in an observational study</h2>
+<p>We want to estimate the average treatment effect (ATE) of a binary treatment <span class="math inline">\(A\)</span> on a continuous outcome <span class="math inline">\(Y\)</span> in a system with confounders <span class="math inline">\(W\)</span>. The ATE is a causal parameter <span class="math inline">\(\psi\)</span>, that can be seen as a <em>functional</em> <span class="math inline">\(\Psi\)</span> of the observational distribution <span class="math inline">\(P_0\)</span> induced by a structural causal model (SCM).</p>
+<p><span class="math display">\[
+\psi  = \underbrace{\Delta_a\mathbb{E}[Y\mid\operatorname{do}(A=a)]}_{\text{causal parameter}} = \underbrace{\Psi[P_0]}_{\text{identification}} = \underbrace{\mathbb{E}_W\Delta_a\mathbb{E}[Y\mid W, A=a]}_{\text{statistical parameter}}
+\]</span> Then, a simple TMLE-based recipe to construct a consistent and efficient estimator <span class="math inline">\(\hat{\psi}_{\star}\)</span> consist of six steps:</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Step 1: Fit initial models for the conditional outcome expectation and for the propensity score
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Such models can be fitted by any parametric or semiparametric procedure, provided no overfitting*. <span class="math display">\[
+\begin{aligned}
+\hat{Q}(A,W) &amp;= \hat{\mathbb{E}}[Y\mid W, A]\\
+\hat{G}(W) &amp;= \hat{\mathbb{P}}(A=1\mid W)
+\end{aligned}
+\]</span></p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Step 2: Derive the efficient influence function (EIF)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The efficient influence function (EIF) of <span class="math inline">\(\Psi\)</span> at <span class="math inline">\(P_0\)</span> for observation <span class="math inline">\((W_i,A_i,Y_i)\)</span> is just the sum of two (orthogonal) components:</p>
+<ol type="1">
+<li>The “error” of the outcome model (conditional expectation / CATE) with respect to the true ATE</li>
+<li>The “error” of the outcome model multiplied by <em>inverse probability of treatment</em> (IPW) weight</li>
+</ol>
+<p><span class="math display">\[
+\operatorname{EIF}_{\Psi,P_0}(W_i,A_i,Y_i) = \underbrace{\Delta_aQ(a,W_i)-\psi}_{\text{CATE - ATE}} + \underbrace{(Y_i-Q(A_i,W_i))}_{\text{"error" of outcome model}}\cdot\underbrace{\left[\frac{A_i}{G(W_i)}-\frac{1-A_i}{1-G(W_i)} \right]}_{\text{IPW}}
+\]</span></p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Step 3: Create the clever covariates
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The coefficient of the error of the outcome model in the EIF, based on the IPW weights, defines the <em>clever covariate</em> <span class="math inline">\(H_i\)</span>. Using the treatment model fitted in step 1, such covariate can be computed for unit <span class="math inline">\(i\)</span> in three scenarios: observed, under treatment and under control:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\hat{H}_i &amp;= \frac{A_i}{\hat{G}(W_i)}-\frac{1-A_i}{1-\hat{G}(W_i)}\\
+\hat{H}_i^1 &amp;= \frac{1}{\hat{G}(W_i)}\\
+\hat{H}_i^0 &amp;= \frac{-1}{1-\hat{G}(W_i)}
+\end{aligned}
+\]</span></p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Step 4: Find the optimal fluctuation parameter
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Fit a linear regression model <strong>with no intercept</strong>, where the dependent variable is the residuals by the fitted initial outcome model, and the only predictor is the computed <em>observed</em> clever covariate <span class="math inline">\(\hat{H}_i\)</span>. Let us call with <span class="math inline">\(\epsilon\)</span> the coefficient of <span class="math inline">\(\hat{H}_i\)</span> in this regression.</p>
+<p><span class="math display">\[
+Y_i - \hat{Q}(W_i,A_i)\sim \epsilon\hat{H}_i
+\]</span></p>
+<p>Then, the value of <span class="math inline">\(\hat{\epsilon}\)</span> is the estimated optimal fluctuation parameter.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Step 5: Update the conditional outcome expectation model
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Update the initial outcome model using the estimated optimal fluctuation parameter <span class="math inline">\(\hat{\epsilon}\)</span> for two scenarios: under treatment and under control, using the respective clever covariate</p>
+<p><span class="math display">\[
+\begin{aligned}
+\tilde{Q}^1_i &amp;= \hat{Q}(W_i,1) + \hat{\epsilon}\hat{H}_i^1\\
+\tilde{Q}^0_i &amp;= \hat{Q}(W_i,0) + \hat{\epsilon}\hat{H}_i^0
+\end{aligned}
+\]</span></p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Step 6: Compute the updated estimator
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The average contrast (treatment vs control) of the updated predictions of mean outcome, across all the i.i.d-sampled units, is the TMLE estimator.</p>
+<p><span class="math display">\[
+\hat{\psi}_{\star} = \frac{1}{n}\sum_{i=1}^n (\tilde{Q}^1_i-\tilde{Q}^0_i)
+\]</span> To do inference and compute confidence intervals, an estimator of its standard error can be computed directly from the unit-level estimates of the EIF, as <span class="math inline">\(\hat{\sigma} = \sqrt{\hat{\operatorname{var}}(\operatorname{EIF}_i)/n}\)</span></p>
+</div>
+</div>
+</section>
+<section id="a-semi-formal-motivation-and-presentation" class="level2">
+<h2 class="anchored" data-anchor-id="a-semi-formal-motivation-and-presentation">A semi-formal motivation and presentation</h2>
+<section id="the-influence-function-if" class="level3">
+<h3 class="anchored" data-anchor-id="the-influence-function-if">The influence function (IF)</h3>
+<blockquote class="blockquote">
+<p>The influence function of a parameter measures its sensitivity to small perturbations in the underlying distribution. It is very important for inference, as it gives all the information to describe the assymptotic bias and variance of certain kind of estimators (RAL).</p>
+</blockquote>
+<p>To motivate the use of the influence function (IF) of a <em>functional</em>, let us first consider the more common case of <em>function approximation</em>.</p>
+<p>Consider that we have a smooth function <span class="math inline">\(L:\mathbb{R}^d\rightarrow\mathbb{R}\)</span>. A <strong>Taylor series expansion</strong> allows us to express the value of <span class="math inline">\(f\)</span> at <span class="math inline">\(\theta_1\)</span> in terms of another value <span class="math inline">\(\theta_0\)</span>:</p>
+<p><span class="math display">\[
+\begin{aligned}
+    f(\theta_1) &amp;= f(\theta_0) + \grad{f(\theta_0)}^\top (\theta_1-\theta_0)+ \frac{1}{2}(\theta_1-\theta_0)^\top \grad^2 f(\theta_0)\cdot (\theta_1-\theta_0) +\cdots\\
+    &amp;= f(\theta_0) + \grad{f(\theta_0)}^\top (\theta_1-\theta_0)+ R_2,\quad \text{ with } R_2 = O(\norm{\theta_1-\theta_0}^2)\\
+     \underbrace{f(\theta_1) - f(\theta_0)}_{\text{bias}} &amp;= \underbrace{\grad{f(\theta_0)}^\top (\theta_1-\theta_0)}_{\text{directional derivative}}+ \underbrace{R_2}_{\text{2nd order}}
+\end{aligned}
+\]</span> This is, we can compute the bias of <em>approximating <span class="math inline">\(f(\theta_1)\)</span> with <span class="math inline">\(f(\theta_0)\)</span></em> as the inner product of the <strong>gradient at <span class="math inline">\(\theta_0\)</span></strong> with the differential <span class="math inline">\((\theta_1-\theta_0)\)</span> plus a <strong>second-order remainder</strong>.</p>
+<p>When <span class="math inline">\(L\)</span> is the log-likelihood function of parameter <span class="math inline">\(\theta\)</span> in a statistical model, such an expansion allows us to approximate the asymptotic distribution of the MLE estimator <span class="math inline">\(\theta_1=\hat{\theta}\)</span>. This is known as the <strong>delta method</strong> <span class="citation" data-cites="deltaMethod">(<a href="#ref-deltaMethod" role="doc-biblioref">Doob 1935</a>)</span>.</p>
+<blockquote class="blockquote">
+<p>What if <span class="math inline">\(f\)</span> is not a function, but a <em>functional</em>? Can we do a similar kind of approximation?</p>
+</blockquote>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Functionals
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In the most general sense, a functional is a function that takes another function as an input and returns a “value”, usually numeric, as an output. For instance:</p>
+<ul>
+<li>The expected value of a real random variable <span class="math inline">\(X\)</span>, <span class="math inline">\(\mathbb{E}[X]\)</span>, is a functional: it takes its CDF <span class="math inline">\(P_X\)</span> and returns a value <span class="math inline">\(\mu\in\mathbb{R}\)</span></li>
+<li>The ATE of a binary treatment <span class="math inline">\(A\)</span> on a real outcome <span class="math inline">\(Y\)</span>, <span class="math inline">\(\Delta_a\mathbb{E}[Y\mid\operatorname{do}(A=a)]\)</span>, is a functional: it takes the interventional distribution <span class="math inline">\(P(Y\mid\operatorname{do}(A=a))\)</span> (or the SCM-induced observational distribution <span class="math inline">\(P_0\)</span>) and returns a value <span class="math inline">\(\psi\in\mathbb{R}\)</span></li>
+</ul>
+</div>
+</div>
+<p>There are, in fact, <strong>functional Taylor series expansion</strong> and <strong>functional delta method</strong> as extensions to variational calculus <span class="citation" data-cites="asymptotic">(<a href="#ref-asymptotic" role="doc-biblioref">Vaart 2000</a>)</span>. However, to apply it, <span class="math inline">\(\Psi\)</span> has to be <em>pathwise differentiable</em> (its ‘derivative’ has to exist). Then:</p>
+<p><span class="math display">\[
+\begin{aligned}
+    \Psi[P_1] - \Psi[P_0] &amp;= \underbrace{\dv{\epsilon}\eval{\Psi[P_0+\epsilon(P_1-P_0)]}_{\epsilon=0}}_{\text{Gâteaux derivative}} + \underbrace{R_2}_{\text{2nd order}}\\
+    &amp;= \int \underbrace{\dv{\epsilon}\eval{\Psi[P_0+\epsilon\delta_x]}_{\epsilon=0}}_{\text{functional derivative}} \dd(P_1-P_0)(x) + R_2
+\end{aligned}
+\]</span> Where <span class="math inline">\(R_2\)</span> is a second-order term, measured using an appropiate distance between distributions, <span class="math inline">\(R_2=O(\norm{P_1-P_0}^2)\)</span>.</p>
+<p>If <span class="math inline">\(\dv{\epsilon}\eval{\Psi[P_0+\epsilon\delta_x]}_{\epsilon=0}\)</span> exists, <span class="math inline">\(\Psi\)</span> is said to be pathwise differentiable and such derivative is named <strong>influence function</strong> of <span class="math inline">\(\Psi\)</span> at <span class="math inline">\((P_0,x)\)</span>.</p>
+<blockquote class="blockquote">
+<p>The IF quantifies the sensitivity of <span class="math inline">\(\Psi\)</span> to a mixture of <span class="math inline">\(P_0\)</span> with a point mass at <span class="math inline">\(x\)</span> by an infinitessimal amount. In other words, it measures how much the target changes when we perturb the distribution by adding a tiny more of the observation <span class="math inline">\(x\)</span>.</p>
+</blockquote>
+<p><span class="math display">\[
+\begin{aligned}
+    \Psi[P_1] - \Psi[P_0] &amp;= \int \text{IF}_{\Psi,P_0}(x)\,\dd(P_1-P_0)(x) + R_2
+\end{aligned}
+\]</span> An important property of the IF, which is consequence of the Fundamental Theorem of Calculus (and the properties of Dirac distributions), is that:</p>
+<p><span class="math display">\[
+\int \text{IF}_{\Psi,P_0}(x)\,\dd P_0(x) = \mathbb{E}_{X\sim P_0}\text{IF}_{\Psi,P_0}(X) = 0
+\]</span></p>
+<blockquote class="blockquote">
+<p>If we contaminate the true distribution with perturbations coming from <em>the same</em> distribution, there should be no expected change in the target.</p>
+</blockquote>
+<p>Now consider the case where:</p>
+<ul>
+<li><span class="math inline">\(P_0\)</span> is the true distribution, which is unknown. This is, <span class="math inline">\(\psi=\Psi[P_0]\)</span> is the true value of the target.</li>
+<li>We live in a fully nonparametric world and have access to a fully nonparametric estimate of <span class="math inline">\(P_0\)</span>, denoted <span class="math inline">\(P_1=\hat{P}_n\)</span> and computed with <span class="math inline">\(n\)</span> samples and an empirical average in the outer-most submodel. Thus, a natural estimator of <span class="math inline">\(\psi\)</span> is the <strong>plug-in</strong> <span class="math inline">\(\Psi[\hat{P}_n]\)</span>.</li>
+</ul>
+<blockquote class="blockquote">
+<p>It turns out that if the world-model is fully nonparametric/saturated, the influence function is unique and then it’s called <em>efficient influence function</em> (EIF) or <em>canonical gradient</em>.</p>
+</blockquote>
+<p>Then, by all the above: <span class="math display">\[
+\begin{aligned}
+    \Psi[\hat{P}_n] - \Psi[P_0] &amp;= \int \text{EIF}_{\Psi,P_0}(x)\,\dd(\hat{P}_n-P_0)(x) + R_2\\
+    &amp;= \mathbb{E}_{X\sim \hat{P}_n}\text{EIF}_{\Psi,P_0}(X)-0 + R_2\\
+    &amp;= \frac{1}{n}\sum_{i=1}^n \text{EIF}_{\Psi,P_0}(X_i) + R_2
+\end{aligned}
+\]</span></p>
+<blockquote class="blockquote">
+<p>Why is the EIF importat?</p>
+</blockquote>
+<p>Using heavily technical tools from the theory of empirical processes (regularity, Hadamard differentiability, von Mises calculus, Gaussian process convergence, etc) it can be shown that, if the models used to construct <span class="math inline">\(\hat{P}_n\)</span> are in a <span class="math inline">\(P_0\)</span>-Donsker class; i.e., <strong>these models do not overfit the data</strong>; then <span class="math inline">\(R_2\)</span> goes to zero very quickly.</p>
+<p><span class="math display">\[
+    \Psi[\hat{P}_n] - \Psi[P_0] = \frac{1}{n}\sum_{i=1}^n \text{EIF}_{\Psi,P_0}(X_i) + o_p(n^{-1/2})
+\]</span> This means that:</p>
+<ul>
+<li><span class="math inline">\(\Psi[\hat{P}_n]\)</span> is a <em>regular asymptotic linear</em> estimator (RAL). The best kind!</li>
+<li>In large samples, the second-order bias does not matter. <strong>Most of the bias is contained in the EIF</strong>!</li>
+<li>We can do inference, as the <em>central limit theorem</em> (CLT) allows us to use a Gaussian approximation. Even if we used fancy machine learning methods to construct <span class="math inline">\(\hat{P}_n\)</span>, provided the Donsker class condition.</li>
+</ul>
+</section>
+</section>
+<section id="back-to-tmle" class="level2">
+<h2 class="anchored" data-anchor-id="back-to-tmle">Back to TMLE</h2>
+<section id="why-the-eif-is-important-then" class="level3">
+<h3 class="anchored" data-anchor-id="why-the-eif-is-important-then">Why the EIF is important then?</h3>
+<blockquote class="blockquote">
+<p>Under some conditions the EIF, it helps us remove a big chunk of bias from an estimator of the target parameter, and allows us to do valid inference even when using machine learning methods.</p>
+</blockquote>
+<p>The idea of TMLE is to update <span class="math inline">\(\hat{P}_n\)</span> to <span class="math inline">\(\hat{P}_n^*\)</span> such that the approximate bias, given by an estimated-perturbed EIF, is zero <span class="citation" data-cites="TMLEbook1">(<a href="#ref-TMLEbook1" role="doc-biblioref">van der Laan and Rose 2011</a>)</span>. <span class="math display">\[
+    \Psi[\hat{P}^*_n] - \Psi[P_0] \approx \frac{1}{n}\sum_{i=1}^n \text{EIF}_{\Psi,\hat{P}^*_n}(X_i) = 0
+\]</span></p>
+</section>
+<section id="where-is-the-loss-function" class="level3">
+<h3 class="anchored" data-anchor-id="where-is-the-loss-function">Where is the loss function?</h3>
+<blockquote class="blockquote">
+<p>Making the estimated-perturbed EIF equals zero can be achieved via minimizing an empirical risk based on an appropriate loss function over a fluctuation parameter (defining the perturbed models).</p>
+</blockquote>
+<p>Let us go back to the simple example on the TMLE recipe for the ATE in an observational study. We want to estimate the ATE using TMLE, and we consider perturbations <strong>only on the conditional expectation of the outcome</strong>, so we do not update the treatment model. Let us work backward and consider a linear-in-means perturbation using an unknown clever covariate, so that <span class="math inline">\(\epsilon=0\)</span> means <em>“no update”</em>:</p>
+<p><span class="math display">\[
+Q_\epsilon(A,W) = Q(A,W) + \epsilon H
+\]</span> The estimated EFI under such perturbation is then: <span class="math display">\[
+\begin{aligned}
+\frac{1}{n}\sum_{i=1}^n\operatorname{EIF}_{\Psi,\hat{Q}_\epsilon}(W_i,A_i,Y_i) &amp;= \underbrace{\frac{1}{n}\sum_{i=1}^n\Delta_a\hat{Q}_\epsilon(a,W_i)-\psi}_{\text{goes to zero}} + \frac{1}{n}\sum_{i=1}^n\underbrace{(Y_i-\hat{Q}_\epsilon(A_i,W_i))}_{\text{"error" of outcome model}}\cdot\underbrace{\left[\frac{A_i}{\hat{G}(W_i)}-\frac{1-A_i}{1-\hat{G}(W_i)} \right]}_{\text{IPW}}\\
+&amp;\approx \frac{1}{n}\sum_{i=1}^n (Y_i-\hat{Q}_\epsilon(A_i,W_i))\cdot\left[\frac{A_i}{\hat{G}(W_i)}-\frac{1-A_i}{1-\hat{G}(W_i)} \right]\\
+&amp;\approx \frac{1}{n}\sum_{i=1}^n(Y_i-\hat{Q}(A_i,W_i)-\epsilon H_i)\cdot\left[\frac{A_i}{\hat{G}(W_i)}-\frac{1-A_i}{1-\hat{G}(W_i)} \right]
+\end{aligned}\\
+\]</span> Now consider the <strong>square loss</strong> <span class="math inline">\(L(y,\hat{y})=\frac{1}{2}(y-\hat{y})^2\)</span> and the associated empirical risk <span class="math inline">\(\mathcal{R}=\frac{1}{n}\sum_{i=1}^{n}L(y_i,\hat{y}_i)\)</span>. If we apply it for the perturbed outcome model, and compute its derivative with respect to <span class="math inline">\(\epsilon\)</span>, we get: <span class="math display">\[
+\begin{aligned}
+\mathcal{R} &amp;= \frac{1}{2n}\sum_{i=1}^n(Y_i-\hat{Q}(A_i,W_i)-\epsilon H_i)^2\\
+\dv{\mathcal{R}}{\epsilon} &amp;= \frac{-1}{n}\sum_{i=1}^n(Y_i-\hat{Q}(A_i,W_i)-\epsilon H_i)\cdot H_i
+\end{aligned}
+\]</span></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Voilà
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <span class="math inline">\(\epsilon\)</span>-minimizer of this risk/loss is the value <span class="math inline">\(\hat{\epsilon}\)</span> that makes the derivative equals zero. <strong>Notice this is the same value of <span class="math inline">\(\epsilon\)</span> that would make the estimated-perturbed EIF equals zero, when <span class="math inline">\(H=\text{IPW}\)</span></strong>. So this is why it is a <strong>clever</strong> covariate!</p>
+<p>As a consequence, we just need to regress the errors of the initial outcome model against such clever covariate (with no intercepts), and its estimated regression coefficient would give us exactly the value <span class="math inline">\(\hat{\epsilon}\)</span> required to update the outcome model such that the estimated plug-in bias is zero.</p>
+<p>The TMLE estimator is, as shown before, constructed as: <span class="math display">\[
+\hat{\psi}_{\star} = \frac{1}{n}\sum_{i=1}^n (\tilde{Q}^1_i-\tilde{Q}^0_i) =  \frac{1}{n}\sum_{i=1}^N \left[\hat{Q}(W_i,1)-\hat{Q}(W_i,0)+\hat{\epsilon}\left(\frac{1}{\hat{G}(W_i)}-\frac{1}{1-\hat{G}(W_i)} \right)\right]
+\]</span></p>
+</div>
+</div>
+</section>
+<section id="what-are-actually-the-clever-covariates" class="level3">
+<h3 class="anchored" data-anchor-id="what-are-actually-the-clever-covariates">What are actually the clever covariates?</h3>
+<blockquote class="blockquote">
+<p>The clever covariates are the projection, in a Hilbert space sense, of the orthogonal components of the canonical gradient onto the nuisance tangent space</p>
+</blockquote>
+<p>Yuck!</p>
+
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-deltaMethod" class="csl-entry" role="listitem">
+Doob, Joseph L. 1935. <span>“The Limiting Distributions of Certain Statistics.”</span> <em>Annals of Mathematical Statistics</em> 6 (3): 160–69. <a href="https://www.jstor.org/stable/2957546">https://www.jstor.org/stable/2957546</a>.
+</div>
+<div id="ref-fisher2021visually" class="csl-entry" role="listitem">
+Fisher, Aaron, and Edward H Kennedy. 2021. <span>“Visually Communicating and Teaching Intuition for Influence Functions.”</span> <em>The American Statistician</em> 75 (2): 162–72.
+</div>
+<div id="ref-gruber2009targeted" class="csl-entry" role="listitem">
+Gruber, Susan, and Mark J van der Laan. 2009. <span>“Targeted Maximum Likelihood Estimation: A Gentle Introduction.”</span> <em>The American Statistician</em> 63 (4): 1–38.
+</div>
+<div id="ref-hines2022demystifying" class="csl-entry" role="listitem">
+Hines, Oliver, Oliver Dukes, Karla Diaz-Ordaz, and Stijn Vansteelandt. 2022. <span>“Demystifying Statistical Learning Based on Efficient Influence Functions.”</span> <em>The American Statistician</em> 76 (3): 292–304.
+</div>
+<div id="ref-ilustrated" class="csl-entry" role="listitem">
+Hoffman, Katherine. 2020. <span>“An Illustrated Guide to TMLE, Part i: Introduction and Motivation.”</span> <em>Kat’s Stats</em>. <a href="https://www.khstats.com/blog/tmle/tutorial">https://www.khstats.com/blog/tmle/tutorial</a>.
+</div>
+<div id="ref-asymptotic" class="csl-entry" role="listitem">
+Vaart, A. W. van der. 2000. <em>Asymptotic Statistics</em>. Cambridge University Press. <a href="https://EconPapers.repec.org/RePEc:cup:cbooks:9780521784504">https://EconPapers.repec.org/RePEc:cup:cbooks:9780521784504</a>.
+</div>
+<div id="ref-TMLEbook1" class="csl-entry" role="listitem">
+van der Laan, Mark J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference for Observational and Experimental Data</em>. Springer Series in Statistics. Springer New York. <a href="https://books.google.no/books?id=RGnSX5aCAgQC">https://books.google.no/books?id=RGnSX5aCAgQC</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,7 +1,7 @@
 ---
 title: "Johan de Aguas"
 image: headshot.JPG
-fontsize: 12pt
+fontsize: 11pt
 about: 
   template: trestles
   image-shape: rounded
@@ -29,31 +29,41 @@ about:
 
 ## About me
 
-I am an international [Fulbright](https://foreign.fulbrightonline.org/) scholar and currently work as a researcher. My research primarily focuses on **causal inference with observational data**, **graphical models for information selection**, **semiparametric estimation theory**, and **spatial econometrics**. 
+I am a postdoctoral research fellow at [Integreat](https://www.integreat.no) -- the Norwegian Centre for Knowledge-driven Machine Learning at University of Oslo ([UiO](https://www.mn.uio.no/math/english/people/aca/johanmd/)). I am also an international [Fulbright](https://foreign.fulbrightonline.org/) scholar.
 
-I recently completed my **PhD in Statistics at the Department of Mathematics**, Faculty of Mathematics and Natural Sciences ([MatNat](https://www.mn.uio.no/english/)), at the University of Oslo ([UiO](https://www.uio.no/english/)). My academic background also includes:
+## Research and academic profile
 
-- MSc in Statistics -- Michigan State University ([MSU](https://msu.edu/))
-- MA in Economics -- Universidad de los Andes ([UniAndes](https://uniandes.edu.co/en)) 
-- BA in Economics -- UniAndes
-- BEng in Industrial Engineering -- UniAndes. 
+My research focuses on:
 
-My professional experience spans roles as a **researcher**, **consultant**, and **lead data scientist**. I have contributed to projects involving: 
+- Efficient estimation of effects from modified stochastic interventions,  
+- Graphical models for causal inference under selection and mechanism shift,
+- Partial identification of causal and counterfactual queries,
+- Econometric analysis of regional and network drivers of development. 
 
-- the evaluation of benefits from pharmacological treatment for ADHD,
-- the analysis of international trade and investment flows, 
-- the design and evaluation of randomized experiments for mobile banking products, and
-- the quantitative assessment of regional competitiveness, among others.
+I recently completed a PhD (Statistics) at the [Department of Mathematics](https://www.mn.uio.no/math/english/), UiO. My academic background also includes:
 
+- MSc. Statistics -- Michigan State University ([MSU](https://msu.edu/)),
+- MA. Economics -- Universidad de los Andes ([UniAndes](https://uniandes.edu.co/en)), 
+- BA. Economics -- UniAndes,
+- BEng. Industrial Engineering -- UniAndes. 
+
+## Professional experience
+
+I have worked as a researcher, consultant, and lead data scientist on projects involving:
+
+- evaluating the benefits of pharmacological treatment for children with ADHD,
+- analyzing international trade and investment flows,
+- designing and assessing randomized experiments for mobile banking products, and
+- quantitatively benchmarking regional competitiveness.
 
 ## Scholarships and grants
 
-- 2023:  _Germany exchange program with the Helmholtz Information & Data Science Academy (HIDA)_ -- Norwegian Artificial Intelligence Research Consortium - [NORA](https://www.nora.ai)
+- 2023:  _Germany exchange program with the Helmholtz Information & Data Science Academy (HIDA)_ -- Norwegian Artificial Intelligence Research Consortium ([NORA](https://www.nora.ai)).
 
-- 2019--2021:  [_International Fulbright scholar program_](https://foreign.fulbrightonline.org/) -- United States Department of State
+- 2019--2021:  _International Fulbright scholar program_ -- United States Department of State.
 
-- 2015--2018:  _High-level human capital training program for the regions_ -- Ministry of Science, Technology and Innovation of Colombia
+- 2015--2018:  _High-level human capital training program for the regions_ -- Ministry of Science, Technology and Innovation of Colombia.
 
-- 2008--2012: _Quiero Estudiar_ scholarship program -- UniAndes
+- 2008--2012: _Quiero Estudiar_ scholarship program -- UniAndes.
 
 

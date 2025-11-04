@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2024-05-17">
+<meta name="description" content="A simple setting for a nonregular inference problem">
+
+<title>Semiparametric estimation for the mean ReLU – Johan de Aguas</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-9e6471fc7838a385aca4b39307383b6d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script>
+window.MathJax = {
+  loader: {
+    load: ['[tex]/physics']
+  },
+  tex: {
+    packages: {'[+]': ['physics']}
+  }
+};
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Johan de Aguas</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../research.html"> 
+<span class="menu-text">Research</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#parametric-model-and-inference" id="toc-parametric-model-and-inference" class="nav-link active" data-scroll-target="#parametric-model-and-inference">Parametric model and inference</a></li>
+  <li><a href="#semiparametric-model-and-inference" id="toc-semiparametric-model-and-inference" class="nav-link" data-scroll-target="#semiparametric-model-and-inference">Semiparametric model and inference</a></li>
+  <li><a href="#a-different-estimand" id="toc-a-different-estimand" class="nav-link" data-scroll-target="#a-different-estimand">A different estimand</a>
+  <ul class="collapse">
+  <li><a href="#q.1.-semiparametric-bayesian-estimator" id="toc-q.1.-semiparametric-bayesian-estimator" class="nav-link" data-scroll-target="#q.1.-semiparametric-bayesian-estimator">Q.1. Semiparametric Bayesian estimator</a></li>
+  <li><a href="#q.2.-semiparametric-bayesian-estimator-with-frequentist-like-uq" id="toc-q.2.-semiparametric-bayesian-estimator-with-frequentist-like-uq" class="nav-link" data-scroll-target="#q.2.-semiparametric-bayesian-estimator-with-frequentist-like-uq">Q.2. Semiparametric Bayesian estimator with frequentist-like UQ?</a></li>
+  <li><a href="#q.3.-ral-estimator" id="toc-q.3.-ral-estimator" class="nav-link" data-scroll-target="#q.3.-ral-estimator">Q.3. RAL estimator</a></li>
+  </ul></li>
+  <li><a href="#pathwise-differentiability-1" id="toc-pathwise-differentiability-1" class="nav-link" data-scroll-target="#pathwise-differentiability-1">Pathwise differentiability</a></li>
+  <li><a href="#possible-solution-1-smooth-surrogates" id="toc-possible-solution-1-smooth-surrogates" class="nav-link" data-scroll-target="#possible-solution-1-smooth-surrogates">Possible solution 1: Smooth surrogates</a></li>
+  <li><a href="#possible-solution-2-online-one-step-estimator-oose" id="toc-possible-solution-2-online-one-step-estimator-oose" class="nav-link" data-scroll-target="#possible-solution-2-online-one-step-estimator-oose">Possible solution 2: Online one-step estimator (OOSE)</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Semiparametric estimation for the mean ReLU</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">semiparametric</div>
+    <div class="quarto-category">IF</div>
+    <div class="quarto-category">Bayesian</div>
+    <div class="quarto-category">counterfactual</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    A simple setting for a nonregular inference problem
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">May 17, 2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<hr>
+<section id="parametric-model-and-inference" class="level2">
+<h2 class="anchored" data-anchor-id="parametric-model-and-inference">Parametric model and inference</h2>
+<p>Let <span class="math inline">\(Y\in\{0,1\}\)</span> be a binary variable, and let <span class="math inline">\(X\)</span> be another variable, which can be either absolutely continuous or categorical, serving as a predictor of <span class="math inline">\(Y\)</span>. Using a linear specification for the logit of the conditional mean, we can formulate a logistic regression for <span class="math inline">\(Y\)</span>:<br>
+<span class="math display">\[
+\Psi(x)= \mathbb{E}[Y\mid X=x] = \text{logit}^{-1}\left(\beta_0+\beta_1x \right).
+\]</span></p>
+<p><span class="math inline">\(\Psi(x)\)</span> is effectively the conditional mean of <span class="math inline">\(Y\)</span> within the subpopulation or stratum where <span class="math inline">\(X = x\)</span>. Since this is a <strong>functional of the true distribution</strong> <span class="math inline">\(P_0\)</span>, a more precise notation would be <span class="math inline">\(\Psi[P_0](x)\)</span>.</p>
+<p>The proposed logistic regression is a parametric model, involving finite-dimensional parameters <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span>. If the model is correctly specified, the Maximum Likelihood (ML) estimators of such parameters are <span class="math inline">\(\sqrt{n}\)</span>-consistent, asymptotically efficient, and converge in distribution to a normal distribution with variance equal to the inverse of the Fisher information matrix. Consequently, as more data is added, the estimates quickly become more accurate, and the asymptotic confidence intervals rapidly concentrate around the true.</p>
+<p>Furthermore, according to the <a href="https://en.wikipedia.org/wiki/Bernstein–von_Mises_theorem">Bernstein–von Mises theorem</a>, if the (joint) prior distribution for <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> is absolutely continuous (e.g., Gaussian), then the Bayesian credible intervals will be asymptotically equivalent to frequentist confidence intervals.</p>
+<p>After estimating <span class="math inline">\(\hat{\beta}_0\)</span> and <span class="math inline">\(\hat{\beta}_1\)</span> via Maximum Likelihood Estimation (MLE), a plug-in estimate for <span class="math inline">\(\Psi(x)\)</span> is simply <span class="math inline">\(\text{logit}^{-1}\left(\hat{\beta}_0 + \hat{\beta}_1 x \right)\)</span>. In the case of Bayesian inference, a point estimator for <span class="math inline">\(\Psi(x)\)</span> would be the posterior mean of these plug-ins. That is, if <span class="math inline">\(\{(\beta_0^j, \beta_1^j)\}_{j=1}^J\)</span> are <span class="math inline">\(J\)</span> draws from the posterior distribution, then a point estimate for <span class="math inline">\(\Psi(x)\)</span> would be <span class="math inline">\(J^{-1}\sum_{j=1}^J \text{logit}^{-1}\left(\beta_0^j + \beta_1^j x \right)\)</span>.</p>
+</section>
+<section id="semiparametric-model-and-inference" class="level2">
+<h2 class="anchored" data-anchor-id="semiparametric-model-and-inference">Semiparametric model and inference</h2>
+<p>A semiparametric approach involves replacing the parameters <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> with an unknown function <span class="math inline">\(f\)</span> to provide greater flexibility and fitting to the data: <span class="math display">\[
+\mathbb{E}[Y\mid X] = \text{logit}^{-1}[f(X)].
+\]</span></p>
+<p>Various statistical and machine learning methods can be employed for this purpose, including Single-Index Models (SIM), Generalized Additive Models (GAM), Bayesian Additive Regression Trees (BART), Neural Networks (NN), Kernel Regression Models (KRM), Gaussian Processes (GP), and others.</p>
+<p>In semiparametric theory, the concept of <strong>asymptotical linearity</strong> allows oneself to talk about convergence in the same way as with parametric models.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Asymptotical linearity
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>An estimator <span class="math inline">\(\hat{\psi}\)</span> constructed using data <span class="math inline">\(\{\mathcal{V}_i\}_{i=1}^n\)</span> for a functional of a distribution <span class="math inline">\(\Psi[P_0]\)</span> (e.g., a stratified mean, a risk difference, a log odds-ratio), is <strong>asymptotically linear</strong> with <strong>influence function</strong> <span class="math inline">\(D\in L_0^2(P_0)\)</span> if: <span class="math display">\[
+\underbrace{\hat{\psi}-\Psi[P_0]}_{\text{bias}}=\underbrace{\frac{1}{n}\sum_{i=1}^n D(\mathcal{V}_i)}_{\text{average of } D} + \underbrace{o_{\mathbb{P}}(n^{-1/2})}_{\text{remainder}}.
+\]</span></p>
+<p>In other words, an estimator is asymptotically linear if its asymptotic bias resembles a simple average of a function (the influence function) plus a remainder that diminishes rapidly towards zero. To put it even more simply, <strong>an estimator is asymptotically linear if it behaves like a sample average in the limit</strong> <span class="citation" data-cites="bickel1998">(<a href="#ref-bickel1998" role="doc-biblioref">Bickel et al. 1998</a>)</span>.</p>
+<p>The influence function of <span class="math inline">\(\Psi\)</span> at <span class="math inline">\(P_0\)</span> can be derived as: <span class="math display">\[
+D(\mathcal{V}_i) = \frac{d}{dt}\Psi[(1-t)P_0+t\delta_{\mathcal{V}_i}]\,\big|_{t=0},
+\]</span> provided the derivative exists, and <span class="math inline">\(D \in L_0^2(P_0)\)</span>. The latter means that <span class="math inline">\(D\)</span> must satisfy two conditions: zero mean and finite variance. It is important to note that <span class="math inline">\((1-t)P_0 + t\delta_{\mathcal{V}_i}\)</span> represents a slight fluctuation of the true distribution by mixing it with a point mass at the data point <span class="math inline">\(\mathcal{V}_i\)</span> <span class="citation" data-cites="van2000">(<a href="#ref-van2000" role="doc-biblioref">van der Vaart 2000</a>)</span>.</p>
+</div>
+</div>
+<p>This immediately allows for the construction of a correction to any initial plug-in estimator <span class="math inline">\(\Psi[\hat{P}]\)</span> simply by adding the estimated influence functions: <span class="math display">\[
+\underbrace{\tilde{\psi}}_{\text{one-step corrected}} = \underbrace{\Psi[\hat{P}]}_{\text{plug-in}} + \underbrace{\frac{1}{n}\sum_{i=1}^n \hat{D}(\mathcal{V}_i)}_{\text{average of } \hat{D}}
+\]</span></p>
+<p>Under certain technical conditions, the <strong>one-step corrected estimator</strong> is asymptotically linear for <span class="math inline">\(\Psi[P_0]\)</span> and efficient (with the minimum variance). One of those conditions is that either:</p>
+<ul>
+<li>The plug-in and the influence functions are estimated using different halves of the dataset. This effectively halves the sample size but allows the use of data-adaptive methods such as BART.</li>
+<li>There is no sample splitting, but it is assumed that the estimated influence functions lie within a Donsker class (<strong>no overfitting</strong>), meaning they should not be fitted with highly flexible and data-adaptive methods like BART.</li>
+</ul>
+<p>Another condition is that <span class="math inline">\(\Psi\)</span> is <strong>pathwise differentiable</strong> at <span class="math inline">\(P_0\)</span> <span class="citation" data-cites="hines2022demystifying">(<a href="#ref-hines2022demystifying" role="doc-biblioref">Hines et al. 2022</a>)</span>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Pathwise differentiability
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A functional <span class="math inline">\(\Psi\)</span> is said to be <strong>pathwise differentiable</strong> at <span class="math inline">\(P_0\)</span> with canonical gradient <span class="math inline">\(\tilde{D}_{P_0}\in L_0^2(P_0)\)</span> if for all <span class="math inline">\(\tilde{P}\)</span> one has: <span class="math display">\[
+\frac{d}{dt}\Psi[(1-t)P_0+t\tilde{P}]\,\big|_{t=0} = \mathbb{E}_{\tilde{P}}[\tilde{D}_{P_0}(\mathcal{V})] - \mathbb{E}_{P_0}[\tilde{D}_{P_0}(\mathcal{V})].
+\]</span></p>
+<p>This is to say, <span class="math inline">\(\Psi\)</span> is differentiable in a <em>functional</em> sense, and it has functional derivative <span class="math inline">\(\tilde{D}_{P_0}\)</span>. In some special cases (RAL estimator, defined later), the canonical gradient and the influence function are the same <span class="citation" data-cites="van1995efficient">(<a href="#ref-van1995efficient" role="doc-biblioref">van der Laan 1995</a>)</span>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Properties of one-step corrected estimators
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>One-step corrected estimators, and asymptotically linear estimators in general, are powerful due to their highly valuable properties:</p>
+<ol type="1">
+<li><strong>Rapid convergence to the true value</strong>, even when using very flexible, ML-based, and data-adaptive methods (under sample splitting).</li>
+<li><span style="color:red;"><strong>Valid (asymptotic) uncertainty quantification</strong></span>, as the influence function fully determines the asymptotic variance.</li>
+<li><strong>Multiple robustness</strong>, maintaining consistency even when some components are misspecified (under certain technical conditions).</li>
+</ol>
+</div>
+</div>
+<p>In causal inference, when the functional <span class="math inline">\(\Psi[P_0]\)</span> represents the average treatment effect (ATE), the one-step corrected estimator is named the <strong>augmented inverse probability weighting (AIPW)</strong> estimator. <span class="math display">\[
+\operatorname{AIPW} = \underbrace{\frac{1}{n}\sum_{i=1}^{n}\Delta_a\hat{\mathbb{E}}[Y\mid X_i,A=a]}_{\text{regression plug-in}}+\underbrace{\frac{1}{n}\sum_{i=1}^{n}\frac{(2A_i-1)(Y_i-\hat{\mathbb{E}}[Y\mid X_i,A_i])}{\hat{\mathbb{P}}(A=A_i\mid X_i)}}_{\text{
+average of } \hat{D}}.
+\]</span></p>
+</section>
+<section id="a-different-estimand" class="level2">
+<h2 class="anchored" data-anchor-id="a-different-estimand">A different estimand</h2>
+<p>Now consider the target estimand not being the conditional mean, but instead: <span class="math display">\[
+\Psi[P_0] = \mathbb{E}[\max\{0,\mathbb{E}[Y\mid X]\}] = \mathbb{E}\operatorname{ReLU}(\mathbb{E}[Y\mid X]).
+\]</span></p>
+<p>This parameter is the mean of a function that assigns the value of the conditional mean <span class="math inline">\(\mathbb{E}[Y\mid X]\)</span> if it is positive, and zero if the conditional mean is negative. In other words, it replaces the negative conditional mean at the unit level with zero, retains the positive ones, and averages them.</p>
+<p>If the first term (0) in <span class="math inline">\(\max\{\cdot,\cdot\}\)</span> has <em>index</em> 0, and the second (<span class="math inline">\(\mathbb{E}[Y\mid X]\)</span>) has <em>index</em> 1, what happens when these terms are equal (<span class="math inline">\(\mathbb{E}[Y\mid X]=0\)</span>)? In this case, <span class="math inline">\(\operatorname{ReLU}(\mathbb{E}[Y\mid X])=0\)</span> <strong>regardless of which term has the maximal <em>index</em></strong>.</p>
+<p>Estimands of this type are relevant because they are intrinsically related to lower bounds of partially identified parameters in causal inference, such as the lower bound of the probability of benefit <span class="citation" data-cites="TP">(<a href="#ref-TP" role="doc-biblioref">Tian and Pearl 2000</a>)</span>.</p>
+<p>Let us approach the following questions. <strong>Is it possible to build an estimator for</strong> <span class="math inline">\(\Psi[P_0]\)</span> that is …</p>
+<ol type="1">
+<li><strong>Semiparametric Bayesian?</strong></li>
+<li><strong>Semiparametric Bayesian with credible intervals that are also asymptotically valid confidence intervals?</strong></li>
+<li><strong>RAL (regular and asymptotically linear)?</strong></li>
+</ol>
+<section id="q.1.-semiparametric-bayesian-estimator" class="level3">
+<h3 class="anchored" data-anchor-id="q.1.-semiparametric-bayesian-estimator">Q.1. Semiparametric Bayesian estimator</h3>
+<p>Certainly. The Bayesian framework is versatile and powerful enough to address this inference problem. Semiparametric Bayesian models, such as Bayesian splines, BART, or Gaussian Processes (GPs), can be implemented to generate posterior samples <span class="math inline">\(\{f^j\}_{j=1}^J\)</span> of the function <span class="math inline">\(f(\cdot)=\mathbb{E}[Y\mid X=\cdot]\)</span>. Using a nonparametric specification for <span class="math inline">\(P_X\)</span> and, by the inherent Bayesian property of <strong>plug-in uncertainty propagation</strong>, a posterior sample for <span class="math inline">\(\Psi[P_0]\)</span> would be: <span class="math display">\[
+\left\{\frac{1}{n}\sum_{i=1}^n\operatorname{ReLU}[f^j(X_i)] \right\}_{j=1}^J
+\]</span></p>
+<p>The average of such a samples builds a <strong>mixed-type Bayesian point-estimator</strong> <span class="math inline">\(\check{\psi}\)</span> for <span class="math inline">\(\Psi[P_0]\)</span>. Moreover, several uncertainty quantification measures can be computed directly from the samples.</p>
+</section>
+<section id="q.2.-semiparametric-bayesian-estimator-with-frequentist-like-uq" class="level3">
+<h3 class="anchored" data-anchor-id="q.2.-semiparametric-bayesian-estimator-with-frequentist-like-uq">Q.2. Semiparametric Bayesian estimator with frequentist-like UQ?</h3>
+<p>As observed in the parametric case, credible intervals can be asymptotically equivalent to confidence intervals under very mild conditions. Would the Bayesian estimator defined previously possess this property? The answer is <strong>not generally</strong>.</p>
+<p>It is important to highlight that there are two different philosophical interpretations of Bayesian uncertainty:</p>
+<ol type="1">
+<li>There is a <strong>true</strong> point-value for <span class="math inline">\(\Psi[P_0]\)</span>, and the posterior distribution captures all aleatoric and prior-epistemic uncertainty. This perspective is supported by prominent Bayesian researchers such as <span class="citation" data-cites="Greenland2006">Greenland (<a href="#ref-Greenland2006" role="doc-biblioref">2006</a>)</span> and <span class="citation" data-cites="Gelman2013">Gelman et al. (<a href="#ref-Gelman2013" role="doc-biblioref">2013</a>)</span>.</li>
+<li>There is no single true <span class="math inline">\(\Psi[P_0]\)</span>, as it is inherently nondeterministic, and thus collapsing the posterior distribution into a point value is meaningless. This perspective is appropriate for quantum systems.</li>
+</ol>
+<p>Under the second philosophy, there is no issue with the solution provided in Q.1., as samples from the posterior distribution are all that is needed. In contrast, adopting the first philosophy implies that <strong>frequentist-like <span style="color:red;">coverage</span></strong> is important for uncertainty quantification, as we want to evaluate how well the credible intervals perform at containing the true value.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Condition for frequentist-like coverage of Bayesian posteriors
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Assuming the first philosophy, we can ask: <em>under what conditions would the Bayesian procedure proposed in Q.1. generate credible intervals with nominal coverage?</em> <strong>The answer is precisely whenever</strong> <span class="math inline">\(\Psi[P_0]\)</span> is pathwise differentiable at <span class="math inline">\(P_0\)</span> <span class="citation" data-cites="dumbgen1993 fang2019inference Kitagawa">(<a href="#ref-dumbgen1993" role="doc-biblioref">Dümbgen 1993</a>; <a href="#ref-fang2019inference" role="doc-biblioref">Fang and Santos 2019</a>; <a href="#ref-Kitagawa" role="doc-biblioref">Kitagawa et al. 2020</a>)</span></p>
+</div>
+</div>
+</section>
+<section id="q.3.-ral-estimator" class="level3">
+<h3 class="anchored" data-anchor-id="q.3.-ral-estimator">Q.3. RAL estimator</h3>
+<p>An asymptotically linear estimator that is also <strong>regular</strong> is called… <em>regular asymptotically linear</em> (RAL).</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Regular estimator
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>An estimator <span class="math inline">\(\hat{\psi}_n\)</span> for <span class="math inline">\(\Psi[P_0]\)</span> is called regular if the asymptotic distribution of <span class="math display">\[
+\sqrt{n}\left(\hat{\psi}_n - \Psi\left[\left(1-\frac{1}{\sqrt{n}}\right)P_0+\frac{1}{\sqrt{n}}\tilde{P}\right] \right)
+\]</span> is the same for all <span class="math inline">\(\tilde{P}\)</span>. This is, this asymptotic distribution does not depend on the scores <span class="math inline">\(\frac{d\tilde{P}}{dP_0}-1\)</span>.</p>
+<p>In simpler terms, <strong>a regular estimator is one whose asymptotic distribution is not affected by slight fluctuations of the true distribution</strong> <span class="math inline">\(P_0\)</span>.</p>
+</div>
+</div>
+<p>It has been proven that, if <span class="math inline">\(\Psi[P_0]\)</span> is not pathwise differentiable at <span class="math inline">\(P_0\)</span>, then <strong>no regular estimator of</strong> <span class="math inline">\(\Psi[P_0]\)</span> exists <span class="citation" data-cites="impossibility">(<a href="#ref-impossibility" role="doc-biblioref">Hirano and Porter 2012</a>)</span>. So, again, we need pathwise differentiability!</p>
+</section>
+</section>
+<section id="pathwise-differentiability-1" class="level2">
+<h2 class="anchored" data-anchor-id="pathwise-differentiability-1">Pathwise differentiability</h2>
+<p>The function <span class="math inline">\(\operatorname{ReLU}(\cdot)=\max\{0,\cdot\}\)</span> is differentiable everywhere on the real line, <strong>except at zero</strong>. Consequently, one condition for pathwise differentiability of <span class="math inline">\(\Psi[P_0] = \mathbb{E}\operatorname{ReLU}(\mathbb{E}[Y\mid X])\)</span> at <span class="math inline">\(P_0\)</span> is that <span class="math inline">\(\mathbb{E}[Y\mid X]\)</span> is <span class="math inline">\(P_0\)</span>-<em>almost surely</em> different from zero: <span class="math display">\[
+\int \mathbb{I}(\mathbb{E}[Y\mid X]=0)\, dP_0 = 0.
+\]</span></p>
+<p>If <span class="math inline">\(X\)</span> is discrete, this implies that there should be no stratum <span class="math inline">\(X=x\)</span> with positive probability where the conditional mean of <span class="math inline">\(Y\)</span> is equal to zero.</p>
+<p>It is important to note that whether the condition is met is determined by the true distribution <span class="math inline">\(P_0\)</span> (relative to the target estimand), <strong>not by the models used</strong>. Distributions that violate this condition are referred to as <strong>exceptional</strong> <span class="citation" data-cites="robins2004optimal nonuniqueLuedtke">(<a href="#ref-robins2004optimal" role="doc-biblioref">Robins 2004</a>; <a href="#ref-nonuniqueLuedtke" role="doc-biblioref">Luedtke and van der Laan 2016</a>)</span>.</p>
+<p>It is not hard to envision exceptional cases. For instance, if the target is the lower bound for the probability of benefit, then we are dealing with the estimand <span class="math inline">\(\mathbb{E}\operatorname{ReLU}[\operatorname{CATE}(X)]\)</span>. An <em>immune</em> stratum <span class="math inline">\(X=x_0\)</span>, could exist where the treatment has no effect—neither benefit nor harm. Note that in a quantum-Bayesian framework, if <span class="math inline">\(Y\)</span> is continuous, the true <span class="math inline">\(\operatorname{CATE}(X)\)</span> is a distribution, not a point-value, so we can say it is not exactly zero.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Summary so far
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>We aim to estimate <span class="math inline">\(\Psi[P_0]= \mathbb{E}\operatorname{ReLU}(\mathbb{E}[Y\mid X])\)</span> and perform inference with <strong>valid uncertainty quantification</strong> through confidence or credible intervals that achieve nominal frequentist-like coverage.</p>
+<p>If the true distribution <span class="math inline">\(P_0\)</span> is <strong>nonexceptional</strong>, we can construct a one-step corrected estimator that is RAL under mild conditions, as well as a mixed-type Bayesian estimator that would be consistent under correct specification.</p>
+<p>If the true distribution <span class="math inline">\(P_0\)</span> is <strong>exceptional</strong>, no RAL estimator exists, and Bayesian credible intervals will not be asymptotically equivalent to valid confidence intervals. <span style="color:red;"><strong>What can we do in this case then?</strong></span></p>
+</div>
+</div>
+<p>Now we sketch two potentials solutions: <em>smooth surrogates</em> and the <em>online one-step estimator</em> (OOSE).</p>
+</section>
+<section id="possible-solution-1-smooth-surrogates" class="level2">
+<h2 class="anchored" data-anchor-id="possible-solution-1-smooth-surrogates">Possible solution 1: Smooth surrogates</h2>
+<p>Consider replacing the original target estimand <span class="math inline">\(\Psi[P_0]\)</span> for the following one: <span class="math display">\[
+\Gamma[P_0]  = \mathbb{E}\operatorname{GELU}_h(\mathbb{E}[Y\mid X]),
+\]</span></p>
+<p>where GELU stands for the Gaussian Error Linear Unit, a smooth approximation of ReLU function given by <span class="math inline">\(\operatorname{GELU}_h(x)=x\Phi(x/h)\)</span>, where <span class="math inline">\(\Phi\)</span> is the Gaussian CDF and <span class="math inline">\(h\geq 0\)</span> is a smoothing hyperparameter <span class="citation" data-cites="gelu">(<a href="#ref-gelu" role="doc-biblioref">Hendrycks and Gimpel 2016</a>)</span>. Notice that, in the limit <span class="math inline">\(h\rightarrow 0\)</span>, one has <span class="math inline">\(\operatorname{GELU}_h(\cdot)\rightarrow \operatorname{ReLU}(\cdot)\)</span>.</p>
+<p><strong>Advantages</strong></p>
+<ul>
+<li><span class="math inline">\(\Gamma[P_0]\)</span> is pathways differentiable, so one can construct RAL estimators and semiparametric Bayesian point-estimators with valid credible/confidence intervals.</li>
+</ul>
+<p><strong>Disadvantages</strong></p>
+<ul>
+<li>The original target estimand has been replaced with a <strong>surrogate</strong>, resulting in a different interpretation from the intended parameter. This is known as <em>smoothing bias</em>.</li>
+<li>How should hyperparameter <span class="math inline">\(h\)</span> be selected?</li>
+<li>It is not data-adaptive. If the distribution is actually nonexceptional, smoothing is unnecessary and introduces bias without benefit.</li>
+</ul>
+</section>
+<section id="possible-solution-2-online-one-step-estimator-oose" class="level2">
+<h2 class="anchored" data-anchor-id="possible-solution-2-online-one-step-estimator-oose">Possible solution 2: Online one-step estimator (OOSE)</h2>
+<p>Paper under construction!</p>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-bickel1998" class="csl-entry" role="listitem">
+Bickel, P. J., C. A. J. Klaassen, Y. Ritov, and J. A. Wellner. 1998. <em>Efficient and Adaptive Estimation for Semiparametric Models</em>. Johns Hopkins Series in the Mathematical Sciences. Springer New York. <a href="https://books.google.com/books?id=lSnTm6SC_SMC">https://books.google.com/books?id=lSnTm6SC_SMC</a>.
+</div>
+<div id="ref-dumbgen1993" class="csl-entry" role="listitem">
+Dümbgen, Lutz. 1993. <span>“On Nondifferentiable Functions and the Bootstrap.”</span> <em>Probability Theory and Related Fields</em> 95: 125–40.
+</div>
+<div id="ref-fang2019inference" class="csl-entry" role="listitem">
+Fang, Zheng, and Andres Santos. 2019. <span>“Inference on Directionally Differentiable Functions.”</span> <em>The Review of Economic Studies</em> 86 (1 (306)): 377–412.
+</div>
+<div id="ref-Gelman2013" class="csl-entry" role="listitem">
+Gelman, A., J. B. Carlin, H. S. Stern, D. B. Dunson, A. Vehtari, and D. B. Rubin. 2013. <em>Bayesian Data Analysis, Third Edition</em>. Chapman &amp; Hall/CRC Texts in Statistical Science. Taylor &amp; Francis. <a href="https://books.google.com.co/books?id=ZXL6AQAAQBAJ">https://books.google.com.co/books?id=ZXL6AQAAQBAJ</a>.
+</div>
+<div id="ref-Greenland2006" class="csl-entry" role="listitem">
+Greenland, Sander. 2006. <span>“<span class="nocase">Bayesian perspectives for epidemiological research: I. Foundations and basic methods</span>.”</span> <em>International Journal of Epidemiology</em> 35 (3): 765–75. <a href="https://doi.org/10.1093/ije/dyi312">https://doi.org/10.1093/ije/dyi312</a>.
+</div>
+<div id="ref-gelu" class="csl-entry" role="listitem">
+Hendrycks, Dan, and Kevin Gimpel. 2016. <span>“Gaussian Error Linear Units (GELUs).”</span> <em>arXiv Preprint arXiv:1606.08415</em>.
+</div>
+<div id="ref-hines2022demystifying" class="csl-entry" role="listitem">
+Hines, Oliver, Oliver Dukes, Karla Diaz-Ordaz, and Stijn Vansteelandt. 2022. <span>“Demystifying Statistical Learning Based on Efficient Influence Functions.”</span> <em>The American Statistician</em> 76 (3): 292–304.
+</div>
+<div id="ref-impossibility" class="csl-entry" role="listitem">
+Hirano, Keisuke, and Jack R. Porter. 2012. <span>“Impossibility Results for Nondifferentiable Functionals.”</span> <em>Econometrica</em> 80 (4): 1769–90. <a href="http://www.jstor.org/stable/23271416">http://www.jstor.org/stable/23271416</a>.
+</div>
+<div id="ref-Kitagawa" class="csl-entry" role="listitem">
+Kitagawa, Toru, José Luis Montiel Olea, Jonathan Payne, and Amilcar Velez. 2020. <span>“Posterior Distribution of Nondifferentiable Functions.”</span> <em>Journal of Econometrics</em> 217 (1): 161–75. https://doi.org/<a href="https://doi.org/10.1016/j.jeconom.2019.10.009">https://doi.org/10.1016/j.jeconom.2019.10.009</a>.
+</div>
+<div id="ref-nonuniqueLuedtke" class="csl-entry" role="listitem">
+Luedtke, Alexander R, and Mark J van der Laan. 2016. <span>“Statistical Inference for the Mean Outcome Under a Possibly Non-Unique Optimal Treatment Strategy.”</span> <em>Annals of Statistics</em> 44 (2): 713.
+</div>
+<div id="ref-robins2004optimal" class="csl-entry" role="listitem">
+Robins, James M. 2004. <span>“Optimal Structural Nested Models for Optimal Sequential Decisions.”</span> In <em>Proceedings of the Second Seattle Symposium in Biostatistics</em>, 179–326. Lecture Notes in Statististics. Springer, New York.
+</div>
+<div id="ref-TP" class="csl-entry" role="listitem">
+Tian, Jin, and Judea Pearl. 2000. <span>“Probabilities of Causation: Bounds and Identification.”</span> <em>Annals of Mathematics and Artificial Intelligence</em> 28 (1): 287–313. <a href="https://doi.org/10.1023/A:1018912507879">https://doi.org/10.1023/A:1018912507879</a>.
+</div>
+<div id="ref-van1995efficient" class="csl-entry" role="listitem">
+van der Laan, Mark J. 1995. <em>Efficient and Inefficient Estimation in Semiparametric Models</em>. CWI Tract - Centrum Voor Wiskunde En Informatica. Centrum voor Wiskunde en Informatica. <a href="https://books.google.com/books?id=ZwjvAAAAMAAJ">https://books.google.com/books?id=ZwjvAAAAMAAJ</a>.
+</div>
+<div id="ref-van2000" class="csl-entry" role="listitem">
+van der Vaart, A. W. 2000. <em>Asymptotic Statistics</em>. Asymptotic Statistics. Cambridge University Press. <a href="https://books.google.com/books?id=UEuQEM5RjWgC">https://books.google.com/books?id=UEuQEM5RjWgC</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
