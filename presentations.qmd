@@ -6,6 +6,16 @@ fontsize: 11pt
 
 ------------------------------------------------------------------------
 
+### Interpolated stochastic interventions based on propensity scores, target policies and treatment-specific costs
+
+- 2026-01-23
+- [40th Annual Conference on Artificial Intelligence (AAAI 2026) -- poster](https://aaai.org/conference/aaai/aaai-26/)
+
+<iframe
+  src="https://drive.google.com/file/d/1utLBq0PSI4pDaBRlcq4XMPqcki4MiwBm/preview"
+  width="75%" height="650" allow="autoplay">
+</iframe>
+
 
 ### Challenges in causality and where solutions may come from
 

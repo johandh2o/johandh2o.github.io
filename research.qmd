@@ -11,7 +11,7 @@ fontsize: 11pt
 
 Stochastic (soft) interventions provide fine-grained ways to modify treatment assignment via probabilistic or functional shifts. I study query formulation, interpretability, and efficient estimation under such interventions.
 
-I develop two families of cost-aware interventions that generalize _incremental propensity score interventions_ (IPI) for discrete treatments $A\in\mathcal{A}=\{\alpha_1,\dots,\alpha_K\}$ with costs $c(\alpha_k)\geq 0$. A scalar $\delta\in\mathbb{R}$ defines interpolations from the organic propensity $\pi$ or a target policy $\nu$ toward a _product-of-experts_ blend:
+We present two families of cost-aware interventions that generalize _incremental propensity score interventions_ (IPI) for discrete treatments $A\in\mathcal{A}=\{\alpha_1,\dots,\alpha_K\}$ with costs $c(\alpha_k)\geq 0$. A scalar $\delta\in\mathbb{R}$ defines interpolations from the organic propensity $\pi$ or a target policy $\nu$ toward a _product-of-experts_ blend:
 $$
 \begin{aligned}
     \pi^*_\delta(a\,|\, w) &= \frac{(\zeta_\delta+\xi_\delta(a))\,\pi(a\,|\, w)}{\sum_{a'\in\mathcal{A}}(\zeta_\delta+\xi_\delta(a'))\,\pi(a'\,|\, w)},\\ 
@@ -24,24 +24,23 @@ where $\xi_\delta(a) :=\nu(a)\left(1-e^{-\delta c(a)}\right)$ and $\zeta_\delta 
 
 ![Figure: Tilted source distribution $\pi^*_\delta$ (left) and tilted target distribution $\nu^*_\delta$ (right) for a binary exposure at $W=w$, shown as pointwise transformation of the propensity score $\pi(1\,|\, w)$, for cases $\delta=1.0$ and $\delta=2.5$. Line color indicates the target configuration: $\nu=(0,1)$ (blue) and $\nu=(0.7,0.3)$ (red). Line style denotes the cost structure: $c=(1,1)$ (solid), $c=(0,2)$ (dashed). The first component is for $A=0$ and second for $A=1$.](ipis.png){width="525"}
 
-We derived the _efficient influence function_, under a nonparametric model, of the expected outcomes under these interventions: $\mathbb{E}[Y^{\pi^*_\delta}]$ and $\mathbb{E}[Y^{\nu^*_\delta}]$, respectively, and implemented respective Newton-Raphson one-step estimators.
-
-**Research questions**:
-
-- How can cost-aware stochastic interventions be embedded in resource-constrained decision problems (budgets, deployment costs), and what optimality/duality conditions follow?
-- How can data-dependent targets (e.g., learned dynamic treatment regimes) be incorporated while preserving identification and enabling efficient inference in the presence of nonregularity?
+We derive the _efficient influence function_, under a nonparametric model, of the expected outcomes under these interventions: $\mathbb{E}[Y^{\pi^*_\delta}]$ and $\mathbb{E}[Y^{\nu^*_\delta}]$, respectively, and implemented respective Newton-Raphson one-step estimators.
 
 **Papers**:
 
 - Upcoming.
 
+**Questions I am thinking about**:
+
+- How can cost-aware stochastic interventions be embedded in resource-constrained decision problems (budgets, deployment costs)?
+
 ---
 
 ### Graphical models for causal inference under selection and mechanism shift,
 
-I develop graphical models that encode selection, missingness, attrition, and mechanism shifts. 
+We develop graphical models that encode selection, missingness, attrition, and mechanism shifts. 
 
-Conside a point exposure variable $A$, outcome $Y_1$ and confounders $W$ and $Y_0$ (a lagged, pre-exposure outcome). Some units may have $Y_0$ missing ($R_{Y_0}=0$). If the missingness reflects that the **unit itself** lacks access to $Y_0$ (or $Y_0$ was not realized), downstream mechanisms can change because $Y_0$ cannot inform either $A$ or $Y_1$ for them. Standard missing data graphs ($m$-graphs) cannot represent these shifts. We introduce an augmented graphical model --$lm$-graphs-- that explicitly encodes such shifts and supports identification analysis.
+Consider a point exposure variable $A$, outcome $Y_1$ and confounders $W$ and $Y_0$ (a lagged, pre-exposure outcome). Some units may have $Y_0$ missing ($R_{Y_0}=0$). If the missingness reflects that the **unit itself** lacks access to $Y_0$ (or $Y_0$ was not realized), downstream mechanisms can change because $Y_0$ cannot inform either $A$ or $Y_1$ for them. Standard missing data graphs ($m$-graphs) cannot represent these shifts. We introduce an augmented graphical model, $lm$-graphs, that explicitly encodes such shifts and supports identification analysis.
 
 ![Figure: Graphical representations of systems with missing data on covariate $Y_0$ (a confounder of the casual relationship between $A$ and $Y_1$): (a) An $m$-graph including the proxy variable $Y^\dagger_0$, represented in a blue box as a deterministic function of $R_{Y_0}$ and $Y_0$. (b) An $lm$-graph illustrating labeled CSIs, where $Y_0$ is an input for the mechanisms of $A$ and $Y_1$ when observed ($R_{Y_0} = 1$), but it is not when missing ($R_{Y_0} = 0$). Consequently, $R_{Y_0}$ becomes a causal parent of $A$ and $Y_1$.](lmgraphs.png){width="400"}
 
@@ -58,24 +57,24 @@ $$
 \end{aligned}
 $$
 
-**Research questions**:
-
-- How do the fundamental limits of statistical testability in missing-data models shape identification and inference under $lm$-graphs?   
-- How the existence of context-specific independencies (CSI) impact the construction of regular parametric submodels and the feasibility of efficient estimators (e.g., TMLE)?
-
-
 **Papers**:
 
 - **de Aguas**, Henckel, Pensar, Biele (2025). _Causal inference amid missingness-specific independencies and mechanism shifts_. [UAI proceedings](https://dl.acm.org/doi/10.5555/3762387.3762389).
 - **de Aguas**, Pensar, Varnet-Pérez, Biele (2025). _Recovery and inference of causal effects with sequential adjustment for confounding and attrition_. [Journal of Causal Inference](https://www.degruyterbrill.com/document/doi/10.1515/jci-2024-0009/html)
 
+**Questions I am thinking about**:
+
+- How do the fundamental limits of statistical testability in missing-data models shape identification and inference in causal systems represented by $lm$-graphs?   
+- How context-specific independencies (CSI) impact the construction of regular parametric submodels and the feasibility of efficient estimators (e.g., TMLE)?
+
+
 ---
 
 ### Partial identification of causal and counterfactual queries,
 
-I study how shape constraints can enable point or partial identification for causal and counterfactual parameters.
+We study how shape constraints can enable point or partial identification for causal and counterfactual parameters.
 
-For instance, with a binary point exposure $A$, an (absolutely) continuous outcome $Y$, and pre-exposure stratification variable $X$, one can define the _probability of tiered benefit_, given cutoffs $c=\{c_k\}_{k=1}^{K-1}$, as:
+For instance, with a binary point exposure $A$, a continuous outcome $Y$, and pre-exposure stratification variable $X$, one can define the _probability of tiered benefit_, given cutoffs $c=\{c_k\}_{k=1}^{K-1}$, as:
 $$
 \operatorname{PB}_c(x) = \sum_{k=1}^{K-1}\mathbb{P}(Y^0\in (c_{k-1},c_k],Y^1>c_k\,|\,X=x).
 $$
@@ -84,17 +83,17 @@ $$
 
 Under strong monotonicity, i.e. $\mathbb{P}(Y^1-Y^0\geq 0\,|\,X=x)\in\{0,1\}$, this parameter is point identified when $K=2$ provided $P(Y\,|\,X,\operatorname{do}(A=a))$ is identified. For $K\geq 3$, monotonicity is insufficient and additional shape constraints are needed --or a shift to a partial identification strategy.
 
-I investigate how shape constraints can yield informative bounds for such counterfactuals (including instrumental variables settings) and how to estimate them efficiently, noting that extremum-type functionals often lead to nonregular estimators.
-
-**Research questions**:
-
-- When do shape constraints deliver tighter or more interpretable bounds than _optimal transport_ (OT) relaxations and other techniques?
-- How can we design TMLE estimators for extremum (nonregular) functionals that remain stable and provide valid inference?
-
+We investigate how shape constraints can yield informative bounds for such counterfactuals and how to estimate them efficiently, noting that extremum-type functionals often lead to nonregular estimators.
 
 **Papers**:
 
 - **de Aguas**, Krumscheid, Pensar, Biele (2025). _The probability of tiered benefit: Partial identification with robust and stable inference_. [CLeaR proceedings](https://proceedings.mlr.press/v275/aguas25a.html).
+
+**Questions I am thinking about**:
+
+- When do shape constraints deliver tighter or more interpretable bounds than _optimal transport_ (OT) -type bounds?
+
+
 
 
 
@@ -103,7 +102,7 @@ I investigate how shape constraints can yield informative bounds for such counte
 ### Econometric analysis of regional and network drivers of development.
 
 
-I work at the intersection of econometrics, networks, financial economics, and regional development; often translating analyses into interactive tools. Selected projects include:
+I have worked at the intersection of econometrics, networks, financial economics, and regional development; often translating analyses into interactive tools. Selected projects include:
 
 - Belief and participation cycles in equity markets: analyzed entry–exit dynamics where belief cycles drive participation cycles ([Shinny app](https://financebi.shinyapps.io/buyhigh_crylater/)).
 - Asset prices and portfolio choice in OLG models: studied asset-price and portfolio-choice dynamics in overlapping-generations settings; built an interactive visualization ([Shinny app](https://financebi.shinyapps.io/learning_from_experience/)).

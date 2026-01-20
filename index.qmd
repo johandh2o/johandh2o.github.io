@@ -29,16 +29,17 @@ about:
 
 ## About me
 
-I am a postdoctoral research fellow at [Integreat](https://www.integreat.no) -- the Norwegian Centre for Knowledge-driven Machine Learning at University of Oslo ([UiO](https://www.mn.uio.no/math/english/people/aca/johanmd/)). I am also an international [Fulbright](https://foreign.fulbrightonline.org/) scholar.
+I am a postdoctoral research fellow at [Integreat](https://www.integreat.no) -- the Norwegian Centre for Knowledge-driven Machine Learning at University of Oslo ([UiO](https://www.mn.uio.no/math/english/people/aca/johanmd/)). I am an international [Fulbright](https://foreign.fulbrightonline.org/) scholar.
 
 ## Research and academic profile
 
-My research focuses on:
+My research develops methodology at the intersection of causal inference and machine learning. It spans several topics, including:
 
-- Efficient estimation of effects from modified stochastic interventions,  
-- Graphical models for causal inference under selection and mechanism shift,
-- Partial identification of causal and counterfactual queries,
-- Econometric analysis of regional and network drivers of development. 
+- Causal inference under network interference,
+- Modified stochastic interventions,
+- Selection mechanisms and mechanism shifts,
+- Graphical representations of causal models,
+- Partial identification of counterfactual queries.
 
 I recently completed a PhD (Statistics) at the [Department of Mathematics](https://www.mn.uio.no/math/english/), UiO. My academic background also includes:
 
@@ -51,10 +52,10 @@ I recently completed a PhD (Statistics) at the [Department of Mathematics](https
 
 I have worked as a researcher, consultant, and lead data scientist on projects involving:
 
-- evaluating the benefits of pharmacological treatment for children with ADHD,
-- analyzing international trade and investment flows,
-- designing and assessing randomized experiments for mobile banking products, and
-- quantitatively benchmarking regional competitiveness.
+- Evaluating the benefits of pharmacological treatment for children with ADHD,
+- Analyzing international trade and investment flows,
+- Designing and assessing randomized experiments for mobile banking products, and
+- Quantitatively benchmarking regional competitiveness.
 
 ## Scholarships and grants
 
