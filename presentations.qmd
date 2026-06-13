@@ -6,6 +6,26 @@ fontsize: 11pt
 
 ------------------------------------------------------------------------
 
+### Estimation and Causal Inference
+
+- 2026-05-22
+- [NORA Summer Research School 2026 - Causality and Machine Learning](https://johandh2o.github.io/causal-inference-summer-school/)
+
+<iframe
+  src="https://drive.google.com/file/d/1_tWWl2YvpTRMEpTB1FdJsUyF-duyYnGB/preview"
+  width="75%" height="450" allow="autoplay">
+</iframe>
+
+### Applied Causal Graphs Workshop 
+
+- 2026-05-22
+- [Applied Causal Graphs Workshop 2026](https://applied-causal-graphs.de)
+
+<iframe
+  src="https://drive.google.com/file/d/1FBnKW07t6e1ykXMly7RCs8wxbUzbIuQF/preview"
+  width="75%" height="450" allow="autoplay">
+</iframe>
+
 ### Interpolated stochastic interventions based on propensity scores, target policies and treatment-specific costs
 
 - 2026-01-23
@@ -15,7 +35,6 @@ fontsize: 11pt
   src="https://drive.google.com/file/d/1utLBq0PSI4pDaBRlcq4XMPqcki4MiwBm/preview"
   width="75%" height="650" allow="autoplay">
 </iframe>
-
 
 ### Challenges in causality and where solutions may come from
 
@@ -68,7 +87,6 @@ fontsize: 11pt
 </iframe>
 
 ### Causal inference amid missingness-specific independencies and mechanism shifts 
-
 - 2025-06-13
 - [Uncertainty in Artificial Intelligence (UAI 2025) -- poster](https://www.auai.org/uai2025/)
 
@@ -96,4 +114,3 @@ fontsize: 11pt
   src="https://drive.google.com/file/d/1-4UOA6fBYgMaPME7-yRTdNTQdHsEt74P/preview"
   width="75%" height="450" allow="autoplay">
 </iframe>
-

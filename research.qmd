@@ -5,7 +5,7 @@ fontsize: 11pt
 ---
 
 
----
+------------------------------------------------------------------------
 
 ### Efficient estimation of effects from modified stochastic interventions,  
 
@@ -28,13 +28,13 @@ We derive the _efficient influence function_, under a nonparametric model, of th
 
 **Papers**:
 
-- Upcoming.
+- **de Aguas** (2026). _Interpolated stochastic interventions based on propensity scores, target policies and treatment-specific costs_. [Proceedings of the 40th AAAI Conference on Artificial Intelligence](https://doi.org/10.1609/aaai.v40i43.40989).
 
 **Questions I am thinking about**:
 
 - How can cost-aware stochastic interventions be embedded in resource-constrained decision problems (budgets, deployment costs)?
 
----
+------------------------------------------------------------------------
 
 ### Graphical models for causal inference under selection and mechanism shift,
 
@@ -67,8 +67,7 @@ $$
 - How do the fundamental limits of statistical testability in missing-data models shape identification and inference in causal systems represented by $lm$-graphs?   
 - How context-specific independencies (CSI) impact the construction of regular parametric submodels and the feasibility of efficient estimators (e.g., TMLE)?
 
-
----
+------------------------------------------------------------------------
 
 ### Partial identification of causal and counterfactual queries,
 
@@ -93,11 +92,7 @@ We investigate how shape constraints can yield informative bounds for such count
 
 - When do shape constraints deliver tighter or more interpretable bounds than _optimal transport_ (OT) -type bounds?
 
-
-
-
-
----
+------------------------------------------------------------------------
 
 ### Econometric analysis of regional and network drivers of development.
 
@@ -109,17 +104,3 @@ I have worked at the intersection of econometrics, networks, financial economics
 - US-Latin America trade flows: measured and visualized bilateral trade exposure and dynamics ([Shinny app](https://johandh2o.shinyapps.io/usalac/)).
 - Regional competitiveness in Colombia: constructed and benchmarked competitiveness indices for Colombian departments ([Shinny app](https://johandh2o.shinyapps.io/ECD2019/)).
 - Network and peer effects in sustainable agriculture: used game-theoretic models to study regional adoption and contagion processes (Master’s thesis).
-
-
-
-
-
-
-
-
-
-
-
-
-
-
